@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Silkscreen } from "next/font/google";
 import "./globals.css";
 import { AppBlockerGateBridge } from "@/components/app-blocker-gate-bridge";
+import { AuthProvider } from "@/components/AuthProvider";
+import NavbarWrapper from "@/components/NavbarWrapper";
 
 const pixelFont = Silkscreen({
   variable: "--font-pixel",
@@ -10,8 +12,8 @@ const pixelFont = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  title: "Yggdrasil",
-  description: "Video truth analyzer",
+  title: "MindBloom",
+  description: "Grow your mind, shrink misinformation",
 };
 
 export default function RootLayout({
@@ -22,8 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pixelFont.variable} antialiased safe-area-shell`}>
-        <AppBlockerGateBridge />
-        {children}
+        <AuthProvider>
+          <AppBlockerGateBridge />
+          <div className="app-content">{children}</div>
+          <NavbarWrapper />
+        </AuthProvider>
       </body>
     </html>
   );

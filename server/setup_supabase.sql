@@ -45,3 +45,73 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+-- ═══════════════════════════════════════════════════════════
+-- SOCIAL TABLES
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY,
+    display_name TEXT DEFAULT 'Anon',
+    avatar_url TEXT,
+    is_activity_public BOOLEAN DEFAULT true,
+    age INTEGER,
+    major TEXT,
+    interests TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS friendships (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID NOT NULL,
+    friend_id UUID NOT NULL,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(user_id, friend_id)
+);
+
+CREATE TABLE IF NOT EXISTS activity_log (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID NOT NULL,
+    action_type TEXT,
+    description TEXT,
+    points INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS points_ledger (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID NOT NULL,
+    change INTEGER NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ═══════════════════════════════════════════════════════════
+-- FRIEND CODES & CIRCLES
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS friend_codes (
+    user_id UUID PRIMARY KEY,
+    code TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS circles (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    emoji TEXT DEFAULT '🌿',
+    owner_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS circle_members (
+    circle_id UUID NOT NULL REFERENCES circles(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    joined_at TIMESTAMPTZ DEFAULT now(),
+    PRIMARY KEY (circle_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_circle_members_user ON circle_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_circles_owner ON circles(owner_id);
+CREATE INDEX IF NOT EXISTS idx_friend_codes_code ON friend_codes(code);
