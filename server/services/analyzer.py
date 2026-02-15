@@ -1,6 +1,6 @@
+import base64
 import json
 import logging
-import time
 
 import google.generativeai as genai
 
@@ -99,46 +99,37 @@ def _calculate_points(claims: list[dict]) -> int:
     return 5
 
 
-def _upload_audio(audio_path: str) -> genai.types.File:
-    audio_file = genai.upload_file(audio_path, mime_type="audio/mpeg")
-    while audio_file.state.name == "PROCESSING":
-        time.sleep(2)
-        audio_file = genai.get_file(audio_file.name)
-    if audio_file.state.name == "FAILED":
-        raise RuntimeError("Audio file processing failed")
-    return audio_file
+def _inline_part(path: str, mime_type: str) -> dict:
+    data = open(path, "rb").read()
+    return {
+        "inline_data": {
+            "mime_type": mime_type,
+            "data": base64.b64encode(data).decode(),
+        }
+    }
 
 
 def analyze(audio_path: str, keyframe_paths: list[str]) -> AnalysisResult:
-    audio_file = _upload_audio(audio_path)
-
-    image_parts = []
+    contents = [PROMPT]
+    contents.append(_inline_part(audio_path, "audio/mpeg"))
     for path in keyframe_paths:
-        with open(path, "rb") as f:
-            image_parts.append({"mime_type": "image/jpeg", "data": f.read()})
+        contents.append(_inline_part(path, "image/jpeg"))
 
     model = genai.GenerativeModel("gemini-2.0-flash")
-    contents = [audio_file, *image_parts, PROMPT]
     gen_config = genai.GenerationConfig(response_mime_type="application/json")
 
     result = None
-    try:
-        for attempt in range(2):
-            try:
-                response = model.generate_content(
-                    contents, generation_config=gen_config
-                )
-                result = _parse_json(response.text)
-                break
-            except json.JSONDecodeError:
-                if attempt == 1:
-                    raise
-                logger.warning("JSON parse failed, retrying Gemini call...")
-    finally:
+    for attempt in range(2):
         try:
-            genai.delete_file(audio_file.name)
-        except Exception:
-            pass
+            response = model.generate_content(
+                contents, generation_config=gen_config
+            )
+            result = _parse_json(response.text)
+            break
+        except json.JSONDecodeError:
+            if attempt == 1:
+                raise
+            logger.warning("JSON parse failed, retrying Gemini call...")
 
     if result is None:
         raise RuntimeError("Gemini returned no valid response")
