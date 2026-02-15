@@ -39,7 +39,7 @@ export default function LoginPage() {
     return (
         <div className="auth-page">
             <div className="auth-card">
-                <h1 className="auth-title">🌱 MINDBLOOM</h1>
+                <h1 className="auth-title">MindBloom</h1>
                 <p className="auth-subtitle">
                     {isSignUp ? "Create your account" : "Welcome back, grower"}
                 </p>
@@ -73,8 +73,8 @@ export default function LoginPage() {
                         {loading
                             ? "Loading..."
                             : isSignUp
-                                ? "🌱 Sign Up"
-                                : "🔑 Sign In"}
+                                ? "Sign Up"
+                                : "Sign In"}
                     </button>
                 </form>
 

@@ -13,7 +13,12 @@ interface Circle {
     member_count: number;
 }
 
-const CIRCLE_EMOJIS = ["🔥", "🌿", "⚡", "🎯", "🧠", "💪", "🌸", "🏔️", "🎮", "📚", "🌙", "☀️"];
+const CIRCLE_COLORS = [
+    "#4A7C59", "#5B8A72", "#6B9F8B",
+    "#7EA88B", "#3D6B4F", "#2D5A3F",
+    "#558B6E", "#6FA287", "#4E8565",
+    "#3B7A52", "#477D5E", "#5A9474",
+];
 
 export default function CirclesPage() {
     const { user } = useAuth();
@@ -21,7 +26,7 @@ export default function CirclesPage() {
     const [loading, setLoading] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
     const [newName, setNewName] = useState("");
-    const [newEmoji, setNewEmoji] = useState("🔥");
+    const [selectedColor, setSelectedColor] = useState(CIRCLE_COLORS[0]);
 
     useEffect(() => {
         if (user) loadCircles();
@@ -31,7 +36,6 @@ export default function CirclesPage() {
     async function loadCircles() {
         setLoading(true);
 
-        // Get circles the user is a member of
         const { data: memberships } = await supabase
             .from("circle_members")
             .select("circle_id")
@@ -39,7 +43,6 @@ export default function CirclesPage() {
 
         const circleIds = (memberships ?? []).map((m) => m.circle_id);
 
-        // Also get circles the user owns
         const { data: ownedCircles } = await supabase
             .from("circles")
             .select("*")
@@ -59,7 +62,6 @@ export default function CirclesPage() {
             .select("*")
             .in("id", allIds);
 
-        // Get member counts
         const circlesWithCounts: Circle[] = [];
         for (const c of circlesData ?? []) {
             const { count } = await supabase
@@ -69,7 +71,7 @@ export default function CirclesPage() {
 
             circlesWithCounts.push({
                 ...c,
-                member_count: (count ?? 0) + 1, // +1 for owner
+                member_count: (count ?? 0) + 1,
             });
         }
 
@@ -84,14 +86,13 @@ export default function CirclesPage() {
             .from("circles")
             .insert({
                 name: newName.trim(),
-                emoji: newEmoji,
+                emoji: selectedColor,
                 owner_id: user.id,
             })
             .select()
             .single();
 
         if (data) {
-            // Auto-add owner as member
             await supabase.from("circle_members").insert({
                 circle_id: data.id,
                 user_id: user.id,
@@ -106,9 +107,8 @@ export default function CirclesPage() {
     if (!user) {
         return (
             <div className="page-container ci-page">
-                <h1 className="page-title">🔵 CIRCLES</h1>
+                <h1 className="page-title">Circles</h1>
                 <div className="fr-login-prompt">
-                    <p className="fd-login-icon">🌱</p>
                     <p className="fd-login-text">Sign in to create circles</p>
                     <Link href="/login" className="btn btn-primary">Sign In</Link>
                 </div>
@@ -121,12 +121,12 @@ export default function CirclesPage() {
     return (
         <div className="page-container ci-page">
             <div className="ci-header">
-                <h1 className="page-title">🔵 CIRCLES</h1>
+                <h1 className="page-title">Circles</h1>
                 <button
                     className="btn btn-primary btn-sm"
                     onClick={() => setShowCreate(!showCreate)}
                 >
-                    {showCreate ? "Cancel" : "+ New Circle"}
+                    {showCreate ? "Cancel" : "New Circle"}
                 </button>
             </div>
 
@@ -134,15 +134,14 @@ export default function CirclesPage() {
             {showCreate && (
                 <div className="ci-create-card">
                     <h3 className="ci-create-title">Create a Circle</h3>
-                    <div className="ci-emoji-picker">
-                        {CIRCLE_EMOJIS.map((e) => (
+                    <div className="ci-color-picker">
+                        {CIRCLE_COLORS.map((color) => (
                             <button
-                                key={e}
-                                className={`ci-emoji-btn ${newEmoji === e ? "ci-emoji-btn--active" : ""}`}
-                                onClick={() => setNewEmoji(e)}
-                            >
-                                {e}
-                            </button>
+                                key={color}
+                                className={`ci-color-btn ${selectedColor === color ? "ci-color-btn--active" : ""}`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => setSelectedColor(color)}
+                            />
                         ))}
                     </div>
                     <input
@@ -158,7 +157,7 @@ export default function CirclesPage() {
                         onClick={createCircle}
                         disabled={!newName.trim()}
                     >
-                        🌿 Create Circle
+                        Create Circle
                     </button>
                 </div>
             )}
@@ -166,23 +165,25 @@ export default function CirclesPage() {
             {/* Circles Grid */}
             {circles.length === 0 ? (
                 <div className="ci-empty">
-                    <p className="ci-empty-icon">🔵</p>
                     <p className="ci-empty-text">
                         No circles yet. Create one and invite your friends!
                     </p>
                 </div>
             ) : (
                 <div className="ci-grid">
-                    {circles.map((c) => (
+                    {circles.map((c, i) => (
                         <Link
                             key={c.id}
                             href={`/circles/${c.id}`}
                             className="ci-card"
                         >
-                            <span className="ci-card-emoji">{c.emoji}</span>
+                            <span
+                                className="ci-card-dot"
+                                style={{ backgroundColor: CIRCLE_COLORS[i % CIRCLE_COLORS.length] }}
+                            />
                             <span className="ci-card-name">{c.name}</span>
                             <span className="ci-card-members">
-                                👥 {c.member_count} member{c.member_count !== 1 ? "s" : ""}
+                                {c.member_count} member{c.member_count !== 1 ? "s" : ""}
                             </span>
                         </Link>
                     ))}
@@ -190,9 +191,10 @@ export default function CirclesPage() {
             )}
 
             <Link href="/friends" className="fr-circles-link">
-                <span>👥</span>
                 <span>Manage Friends</span>
-                <span>→</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
             </Link>
         </div>
     );

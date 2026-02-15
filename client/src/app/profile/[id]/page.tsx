@@ -38,19 +38,19 @@ interface ActivityItem {
     created_at: string;
 }
 
-const TREE_EMOJIS: Record<string, string> = {
-    seedling: "🌱",
-    sapling: "🌿",
-    healthy: "🌳",
-    blooming: "🌸",
+const TREE_STATE_LABELS: Record<string, string> = {
+    seedling: "Seedling",
+    sapling: "Sapling",
+    healthy: "Healthy Tree",
+    blooming: "Blooming Tree",
 };
 
-const ACTION_ICONS: Record<string, string> = {
-    analysis: "🔍",
-    reflection: "📝",
-    goal: "🎯",
-    brain_teaser: "🧠",
-    focus_session: "⏱️",
+const ACTION_LABELS: Record<string, string> = {
+    analysis: "Analysis",
+    reflection: "Reflection",
+    goal: "Goal",
+    brain_teaser: "Teaser",
+    focus_session: "Focus",
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -164,7 +164,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         return (
             <div className="page-container pf-page">
                 <div className="pf-login-prompt">
-                    <p>🌱</p>
                     <p className="pf-login-text">Sign in to view profiles</p>
                     <Link href="/login" className="btn btn-primary">Sign In</Link>
                 </div>
@@ -210,7 +209,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                     <h1 className="pf-name">{profile.display_name}</h1>
                     <div className="pf-details">
                         {profile.age && <span>{profile.age}y</span>}
-                        {profile.major && <span>📚 {profile.major}</span>}
+                        {profile.major && <span>{profile.major}</span>}
                     </div>
                     {profile.interests && profile.interests.length > 0 && (
                         <div className="pf-tags">
@@ -231,12 +230,12 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                     </div>
                     <div className="pf-stat">
                         <span className="pf-stat-value">
-                            {TREE_EMOJIS[scores.tree_state] ?? "🌱"}
+                            {TREE_STATE_LABELS[scores.tree_state] ?? "Seedling"}
                         </span>
                         <span className="pf-stat-label">{scores.tree_state}</span>
                     </div>
                     <div className="pf-stat">
-                        <span className="pf-stat-value">🔥 {scores.streak_days}</span>
+                        <span className="pf-stat-value">{scores.streak_days}d</span>
                         <span className="pf-stat-label">Streak</span>
                     </div>
                     <div className="pf-stat">
@@ -248,7 +247,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
             {/* Activity Heatmap */}
             <div className="pf-section">
-                <h2 className="pf-section-title">📊 Activity</h2>
+                <h2 className="pf-section-title">Activity</h2>
                 <div className="hm-container">
                     <div className="hm-months">
                         {monthLabels.map((m) => (
@@ -288,7 +287,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             {isOwnProfile && (
                 <div className="pf-privacy">
                     <span className="pf-privacy-label">
-                        🔒 Activity visible to friends
+                        Activity visible to friends
                     </span>
                     <button onClick={togglePrivacy} className="pf-privacy-toggle">
                         <div className={`pg-toggle ${privacyToggle ? "pg-toggle--on" : ""}`}>
@@ -300,19 +299,19 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
             {/* Recent Activity */}
             <div className="pf-section">
-                <h2 className="pf-section-title">📋 Recent Activity</h2>
+                <h2 className="pf-section-title">Recent Activity</h2>
                 {recentActivity.length === 0 ? (
                     <p className="pf-empty">No activity yet</p>
                 ) : (
                     <div className="pf-activity-list">
                         {recentActivity.map((a) => (
                             <div key={a.id} className="pf-activity-item">
-                                <span className="pf-activity-icon">
-                                    {ACTION_ICONS[a.action_type] ?? "📌"}
+                                <span className="pf-activity-icon" style={{ fontSize: '10px', fontWeight: 'bold' }}>
+                                    {ACTION_LABELS[a.action_type] ? ACTION_LABELS[a.action_type].substring(0, 2).toUpperCase() : "AC"}
                                 </span>
                                 <div className="pf-activity-info">
                                     <span className="pf-activity-desc">
-                                        {a.description ?? a.action_type}
+                                        {a.description ? a.description.replace(/[\u{1F300}-\u{1F9FF}]/gu, '') : a.action_type}
                                     </span>
                                     <span className="pf-activity-meta">
                                         +{a.points} pts · {timeAgo(a.created_at)}

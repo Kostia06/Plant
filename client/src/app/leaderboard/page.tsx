@@ -20,15 +20,6 @@ interface CircleOption {
     emoji: string;
 }
 
-const TREE_EMOJIS: Record<string, string> = {
-    seedling: "🌱",
-    sapling: "🌿",
-    healthy: "🌳",
-    blooming: "🌸",
-};
-
-const RANK_BADGES = ["🥇", "🥈", "🥉"];
-
 export default function LeaderboardPage() {
     const { user } = useAuth();
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
@@ -70,14 +61,12 @@ export default function LeaderboardPage() {
         let userIds: string[] | null = null;
 
         if (selectedCircle !== "all" && selectedCircle !== "friends") {
-            // Circle-specific leaderboard
             const { data: members } = await supabase
                 .from("circle_members")
                 .select("user_id")
                 .eq("circle_id", selectedCircle);
             userIds = (members ?? []).map((m) => m.user_id);
         } else if (selectedCircle === "friends" && user) {
-            // Friends-only leaderboard
             const { data: friendships } = await supabase
                 .from("friendships")
                 .select("user_id, friend_id")
@@ -131,7 +120,7 @@ export default function LeaderboardPage() {
 
     return (
         <div className="page-container lb-page">
-            <h1 className="page-title">🏆 LEADERBOARD</h1>
+            <h1 className="page-title">Leaderboard</h1>
 
             {/* Circle Filter */}
             {user && (
@@ -141,11 +130,11 @@ export default function LeaderboardPage() {
                         onChange={(e) => setSelectedCircle(e.target.value)}
                         className="input lb-filter-select"
                     >
-                        <option value="all">🌍 Everyone</option>
-                        <option value="friends">👥 Friends Only</option>
+                        <option value="all">Everyone</option>
+                        <option value="friends">Friends Only</option>
                         {circles.map((c) => (
                             <option key={c.id} value={c.id}>
-                                {c.emoji} {c.name}
+                                {c.name}
                             </option>
                         ))}
                     </select>
@@ -156,7 +145,6 @@ export default function LeaderboardPage() {
                 <p className="loading-text">Loading leaderboard...</p>
             ) : entries.length === 0 ? (
                 <div className="lb-empty">
-                    <p className="lb-empty-icon">🌱</p>
                     <p className="lb-empty-text">
                         {selectedCircle !== "all"
                             ? "No members in this group yet."
@@ -175,7 +163,7 @@ export default function LeaderboardPage() {
                                     }`}
                             >
                                 <span className="lb-rank">
-                                    {i < 3 ? RANK_BADGES[i] : `#${i + 1}`}
+                                    #{i + 1}
                                 </span>
 
                                 <div className="lb-avatar">
@@ -198,8 +186,7 @@ export default function LeaderboardPage() {
                                         {isMe && <span className="lb-you-badge">YOU</span>}
                                     </span>
                                     <span className="lb-meta">
-                                        {TREE_EMOJIS[entry.tree_state] ?? "🌱"}{" "}
-                                        {entry.tree_state} · 🔥 {entry.streak_days}d streak
+                                        {entry.tree_state} · {entry.streak_days}d streak
                                     </span>
                                 </div>
 

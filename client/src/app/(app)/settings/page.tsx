@@ -21,23 +21,23 @@ export default function DashboardPage() {
 
   return (
     <div className="page-container">
-      <h1 className="text-2xl font-bold mb-4 text-deep-forest text-center font-pixel">MINDBLOOM</h1>
+      <h1 className="page-title">MindBloom</h1>
 
       <section className="mb-6">
-        <div className="w-full">
+        <div className="w-full overflow-hidden">
           <MindBloomDisplay currentScore={currentTotalScore} />
         </div>
       </section>
 
       <section className="dash-actions">
         <Link href="/settings/lock-gate" className="btn btn-primary dash-action-btn">
-          🔒 Lock Gate
+          Lock Gate
         </Link>
         <Link href="/settings/earn" className="btn btn-primary dash-action-btn">
-          🌱 Earn Minutes
+          Earn Minutes
         </Link>
         <Link href="/settings/progress" className="btn btn-primary dash-action-btn dash-action-btn--secondary">
-          📊 Daily Progress
+          Daily Progress
         </Link>
       </section>
 
@@ -45,12 +45,14 @@ export default function DashboardPage() {
         <PlantGuardCard />
       </div>
 
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-2 w-full bg-zinc-100 p-4 rounded-lg border border-zinc-300">
-        <div className="col-span-full mb-1 text-center text-zinc-500 text-xs font-mono">DEV CONTROLS (Test Visuals)</div>
-        <button onClick={() => setDevScoreOffset(s => s - 50)} className="px-2 py-1 bg-red-200 text-red-800 text-xs rounded hover:bg-red-300">-50 Pts (Wither)</button>
-        <button onClick={() => setDevScoreOffset(s => s + 50)} className="px-2 py-1 bg-green-200 text-green-800 text-xs rounded hover:bg-green-300">+50 Pts</button>
-        <button onClick={() => setDevScoreOffset(s => s + 200)} className="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded hover:bg-blue-300">+200 Pts (Boost)</button>
-        <button onClick={() => setDevScoreOffset(0)} className="px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded hover:bg-orange-300">Reset Offset</button>
+      <div className="card" style={{ maxWidth: '100%', overflow: 'hidden' }}>
+        <div className="text-center" style={{ fontSize: '9px', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>DEV CONTROLS (Test Visuals)</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+          <button onClick={() => setDevScoreOffset(s => s - 50)} className="btn btn-sm" style={{ background: '#fecaca', color: '#991b1b', fontSize: '9px' }}>-50 Pts</button>
+          <button onClick={() => setDevScoreOffset(s => s + 50)} className="btn btn-sm" style={{ background: '#bbf7d0', color: '#166534', fontSize: '9px' }}>+50 Pts</button>
+          <button onClick={() => setDevScoreOffset(s => s + 200)} className="btn btn-sm" style={{ background: '#bfdbfe', color: '#1e40af', fontSize: '9px' }}>+200 Pts</button>
+          <button onClick={() => setDevScoreOffset(0)} className="btn btn-sm" style={{ background: '#fed7aa', color: '#9a3412', fontSize: '9px' }}>Reset</button>
+        </div>
       </div>
     </div>
   );

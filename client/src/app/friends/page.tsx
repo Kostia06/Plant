@@ -20,13 +20,6 @@ interface PendingRequest {
     avatar_url: string | null;
 }
 
-const TREE_EMOJIS: Record<string, string> = {
-    seedling: "🌱",
-    sapling: "🌿",
-    healthy: "🌳",
-    blooming: "🌸",
-};
-
 function generateFriendCode(): string {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "BLOOM-";
@@ -50,10 +43,8 @@ export default function FriendsPage() {
         if (!user) return;
         setLoading(true);
 
-        // Ensure tables exist (create if not)
         await ensureTables();
 
-        // Get or create friend code
         const { data: codeData } = await supabase
             .from("friend_codes")
             .select("code")
@@ -68,7 +59,6 @@ export default function FriendsPage() {
             setMyCode(newCode);
         }
 
-        // Get accepted friends
         const { data: friendships } = await supabase
             .from("friendships")
             .select("user_id, friend_id")
@@ -105,7 +95,6 @@ export default function FriendsPage() {
             setFriends([]);
         }
 
-        // Get pending incoming requests
         const { data: pendingData } = await supabase
             .from("friendships")
             .select("id, user_id")
@@ -142,11 +131,7 @@ export default function FriendsPage() {
         loadData();
     }, [loadData]);
 
-    async function ensureTables() {
-        // Try to select from friend_codes — if it errors, we know tables don't exist
-        // Tables should be created via setup_supabase.sql
-        // This is a no-op check
-    }
+    async function ensureTables() { }
 
     async function addFriend() {
         if (!user || !codeInput.trim()) return;
@@ -155,11 +140,10 @@ export default function FriendsPage() {
         const code = codeInput.trim().toUpperCase();
 
         if (code === myCode) {
-            setMessage("That's your own code! 😅");
+            setMessage("That's your own code!");
             return;
         }
 
-        // Look up the code
         const { data: target } = await supabase
             .from("friend_codes")
             .select("user_id")
@@ -171,7 +155,6 @@ export default function FriendsPage() {
             return;
         }
 
-        // Check if already friends or pending
         const { data: existing } = await supabase
             .from("friendships")
             .select("id, status")
@@ -182,23 +165,22 @@ export default function FriendsPage() {
         if (existing && existing.length > 0) {
             const status = existing[0].status;
             if (status === "accepted") {
-                setMessage("You're already friends! 🌿");
+                setMessage("You're already friends!");
             } else if (status === "pending") {
-                setMessage("Friend request already pending ⏳");
+                setMessage("Friend request already pending.");
             } else {
                 setMessage("Request already sent.");
             }
             return;
         }
 
-        // Send friend request
         await supabase.from("friendships").insert({
             user_id: user.id,
             friend_id: target.user_id,
             status: "pending",
         });
 
-        setMessage("Friend request sent! 🌱");
+        setMessage("Friend request sent!");
         setCodeInput("");
     }
 
@@ -229,9 +211,8 @@ export default function FriendsPage() {
     if (!user) {
         return (
             <div className="page-container fr-page">
-                <h1 className="page-title">👥 FRIENDS</h1>
+                <h1 className="page-title">Friends</h1>
                 <div className="fr-login-prompt">
-                    <p className="fd-login-icon">🌱</p>
                     <p className="fd-login-text">Sign in to add friends</p>
                     <Link href="/login" className="btn btn-primary">Sign In</Link>
                 </div>
@@ -243,15 +224,15 @@ export default function FriendsPage() {
 
     return (
         <div className="page-container fr-page">
-            <h1 className="page-title">👥 FRIENDS</h1>
+            <h1 className="page-title">Friends</h1>
 
             {/* Your Friend Code */}
             <div className="fc-card">
-                <span className="fc-label">YOUR FRIEND CODE</span>
+                <span className="fc-label">Your Friend Code</span>
                 <div className="fc-code-row">
                     <span className="fc-code">{myCode}</span>
                     <button className="btn btn-sm" onClick={copyCode}>
-                        {copied ? "✓ Copied!" : "📋 Copy"}
+                        {copied ? "Copied" : "Copy"}
                     </button>
                 </div>
                 <span className="fc-hint">Share this code so friends can add you</span>
@@ -303,13 +284,13 @@ export default function FriendsPage() {
                                         className="btn btn-sm btn-primary"
                                         onClick={() => acceptRequest(req.id)}
                                     >
-                                        ✓ Accept
+                                        Accept
                                     </button>
                                     <button
                                         className="btn btn-sm btn-outline"
                                         onClick={() => declineRequest(req.id)}
                                     >
-                                        ✗
+                                        Decline
                                     </button>
                                 </div>
                             </div>
@@ -326,7 +307,6 @@ export default function FriendsPage() {
                 </h2>
                 {friends.length === 0 ? (
                     <div className="fr-empty">
-                        <p>🌿</p>
                         <p className="fr-empty-text">
                             No friends yet. Share your code to get started!
                         </p>
@@ -351,7 +331,7 @@ export default function FriendsPage() {
                                 <div className="fr-info">
                                     <span className="fr-name">{f.display_name}</span>
                                     <span className="fr-meta">
-                                        {TREE_EMOJIS[f.tree_state] ?? "🌱"} {f.tree_state} · Score: {f.current_score}
+                                        {f.tree_state} · {f.current_score} pts
                                     </span>
                                 </div>
                             </Link>
@@ -362,9 +342,10 @@ export default function FriendsPage() {
 
             {/* Circles Link */}
             <Link href="/circles" className="fr-circles-link">
-                <span>🔵</span>
                 <span>Manage Circles</span>
-                <span>→</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
             </Link>
         </div>
     );
