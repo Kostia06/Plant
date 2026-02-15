@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary */
+  --deep-forest: #2D5F2D;
+  --spring-canopy: #4A8C3F;
+  --ancient-bark: #1B3D1B;
+
+  /* Accents */
+  --golden-sap: #D4A942;
+  --morning-light: #F0D78C;
+  --berry-red: #C44D4D;
+
+  /* Verdicts */
+  --verdict-true: #3DA35D;
+  --verdict-misleading: #E5A100;
+  --verdict-false: #D14545;
+  --verdict-unverified: #8E8E8E;
+
+  /* Backgrounds */
+  --parchment: #F7F4ED;
+  --moss-wash: #EEF2E8;
+  --white: #FFFFFF;
+
+  /* Text */
+  --root-dark: #1A2E1A;
+  --weathered-stone: #5C6B5C;
+  --lichen: #94A394;
+
+  /* Borders */
+  --twig: #D4DCCE;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--parchment);
+  --color-foreground: var(--root-dark);
   --font-sans: var(--font-pixel);
   --font-mono: var(--font-pixel);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Primary */
+  --color-deep-forest: var(--deep-forest);
+  --color-spring-canopy: var(--spring-canopy);
+  --color-ancient-bark: var(--ancient-bark);
+
+  /* Accents */
+  --color-golden-sap: var(--golden-sap);
+  --color-morning-light: var(--morning-light);
+  --color-berry-red: var(--berry-red);
+
+  /* Verdicts */
+  --color-verdict-true: var(--verdict-true);
+  --color-verdict-misleading: var(--verdict-misleading);
+  --color-verdict-false: var(--verdict-false);
+  --color-verdict-unverified: var(--verdict-unverified);
+
+  /* Backgrounds */
+  --color-parchment: var(--parchment);
+  --color-moss-wash: var(--moss-wash);
+  --color-card: var(--white);
+
+  /* Text */
+  --color-root-dark: var(--root-dark);
+  --color-weathered-stone: var(--weathered-stone);
+  --color-lichen: var(--lichen);
+
+  /* Borders */
+  --color-twig: var(--twig);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--parchment);
+  color: var(--root-dark);
   font-family: var(--font-pixel), monospace;
 }
