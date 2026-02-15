@@ -164,7 +164,7 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
                 </p>
             </div>
 
-            {isEvolving && <p className="absolute bottom-20 text-yellow-500 animate-pulse font-bold tracking-widest text-xl z-20 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm">EVOLVING...</p>}
+            {isEvolving && <p className="absolute bottom-8 right-8 text-yellow-500 animate-pulse font-bold tracking-widest text-xl z-20 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm shadow-xl border-2 border-yellow-400">EVOLVING...</p>}
 
             {/* The Tree Sprite */}
             <div
