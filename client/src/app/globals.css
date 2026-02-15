@@ -2032,6 +2032,12 @@ body {
 }
 
 .va-perspectives-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    APP CONTENT (with bottom nav padding)
    ═══════════════════════════════════════════════════════════════ */
 .app-content {
@@ -2290,6 +2296,11 @@ body {
 }
 
 .va-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .auth-input {
   font-size: 10px;
 }
@@ -2318,10 +2329,6 @@ body {
   gap: 0.5rem;
 }
 
-.va-history-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
 .lb-row {
   display: flex;
   align-items: center;
@@ -3340,6 +3347,8 @@ body {
   color: var(--weathered-stone);
   text-align: center;
   padding: 1rem 0;
+}
+
 .btn-sm {
   font-size: 8px;
   padding: 0.35rem 0.75rem;
