@@ -1,24 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d1117;
-  --foreground: #c9d1d9;
-  --card-bg: #161b22;
-  --card-border: #30363d;
-  --accent: #39d353;
-  --accent-dim: #238636;
-  --accent-glow: rgba(57, 211, 83, 0.15);
-  --danger: #f85149;
-  --warning: #d29922;
-  --text-muted: #8b949e;
-  --text-bright: #f0f6fc;
+  /* 
+   * THEME: Deep Forest & Ancient Bark
+   * Based on user-provided palette
+   */
 
-  /* Heatmap greens (GitHub-style) */
-  --heatmap-0: #161b22;
-  --heatmap-1: #0e4429;
-  --heatmap-2: #006d32;
-  --heatmap-3: #26a641;
-  --heatmap-4: #39d353;
+  /* Backgrounds */
+  --background: #0a110a;
+  /* Very dark green, almost black */
+  --foreground: #e2e8f0;
+  /* Off-white text */
+  --card-bg: #112211;
+  /* "Ancient Bark" inspired deep green */
+  --card-border: #1B3D1B;
+  /* True "Ancient Bark" */
+
+  /* Accents & Primary */
+  --primary: #2D5F2D;
+  /* "Deep Forest" (Buttons, Headers) */
+  --primary-hover: #4A8C3F;
+  /* "Spring Canopy" (Hover states) */
+
+  --accent: #D4A942;
+  /* "Golden Sap" (Points, Highlights) */
+  --accent-dim: #b89030;
+  /* Darker Gold */
+  --accent-glow: rgba(212, 169, 66, 0.15);
+  /* Gold glow */
+
+  /* Utility */
+  --danger: #C44D4D;
+  /* "Berry Red" */
+  --warning: #E8A0A0;
+  /* "Autumn Rose" */
+  --highlight: #F0D78C;
+  /* "Morning Light" */
+
+  --text-muted: #849b84;
+  /* Muted green-grey */
+  --text-bright: #ffffff;
+
+  /* Heatmap (Progressive green to gold) */
+  --heatmap-0: #162216;
+  /* Base empty cell */
+  --heatmap-1: #1B3D1B;
+  /* "Ancient Bark" */
+  --heatmap-2: #2D5F2D;
+  /* "Deep Forest" */
+  --heatmap-3: #4A8C3F;
+  /* "Spring Canopy" */
+  --heatmap-4: #D4A942;
+  /* "Golden Sap" (Max activity!) */
 }
 
 @theme inline {
@@ -188,14 +221,14 @@ body {
 }
 
 .btn-primary {
-  background: var(--accent-dim);
+  background: var(--primary);
   color: var(--text-bright);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--background);
-  box-shadow: 0 0 20px var(--accent-glow);
+  background: var(--primary-hover);
+  color: var(--text-bright);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .btn-primary:disabled {
@@ -209,12 +242,12 @@ body {
 }
 
 .btn-accept {
-  background: var(--accent-dim);
+  background: var(--primary);
   color: var(--text-bright);
 }
 
 .btn-accept:hover {
-  background: var(--accent);
+  background: var(--primary-hover);
 }
 
 .btn-decline {
