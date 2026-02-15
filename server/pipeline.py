@@ -68,7 +68,7 @@ def extract_audio(video_path: Path, job_dir: Path) -> Path:
     subprocess.run(
         [
             "ffmpeg", "-i", str(video_path),
-            "-vn", "-acodec", "libmp3lame", "-q:a", "4",
+            "-vn", "-acodec", "libmp3lame", "-q:a", "7", "-ac", "1",
             "-y", str(audio_path),
         ],
         capture_output=True,
@@ -85,7 +85,7 @@ def extract_keyframes(video_path: Path, job_dir: Path) -> list[Path]:
         [
             "ffmpeg", "-i", str(video_path),
             "-vf", f"fps=1/{KEYFRAME_INTERVAL_SECONDS},scale=-1:{MAX_FRAME_HEIGHT}",
-            "-q:v", "3",
+            "-q:v", "8",
             "-y", str(frames_dir / "frame_%04d.jpg"),
         ],
         capture_output=True,

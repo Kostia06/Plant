@@ -1,6 +1,8 @@
+import base64
 import json
 import logging
 import time
+from pathlib import Path
 
 import google.generativeai as genai
 
@@ -66,53 +68,38 @@ MAX_RETRIES = 3
 RETRY_BASE_DELAY = 2
 
 
-def _upload_and_wait(path: str, mime_type: str) -> genai.types.File:
-    uploaded = genai.upload_file(path, mime_type=mime_type)
-    while uploaded.state.name == "PROCESSING":
-        time.sleep(2)
-        uploaded = genai.get_file(uploaded.name)
-    if uploaded.state.name == "FAILED":
-        raise RuntimeError(f"File processing failed: {path}")
-    return uploaded
-
-
-def _cleanup_files(files: list[genai.types.File]) -> None:
-    for f in files:
-        try:
-            genai.delete_file(f.name)
-        except Exception:
-            pass
+def _inline_part(path: str, mime_type: str) -> dict:
+    data = Path(path).read_bytes()
+    return {
+        "inline_data": {
+            "mime_type": mime_type,
+            "data": base64.b64encode(data).decode(),
+        }
+    }
 
 
 def analyze_video(audio_path: str, frame_paths: list[str]) -> dict:
-    uploaded_files = []
-    try:
-        audio_file = _upload_and_wait(audio_path, "audio/mpeg")
-        uploaded_files.append(audio_file)
+    model = genai.GenerativeModel(GEMINI_MODEL)
 
-        for path in frame_paths:
-            frame_file = _upload_and_wait(path, "image/jpeg")
-            uploaded_files.append(frame_file)
+    contents = [ANALYSIS_PROMPT]
+    contents.append(_inline_part(audio_path, "audio/mpeg"))
+    for path in frame_paths:
+        contents.append(_inline_part(path, "image/jpeg"))
 
-        model = genai.GenerativeModel(GEMINI_MODEL)
-        contents = [ANALYSIS_PROMPT, audio_file, *uploaded_files[1:]]
-
-        for attempt in range(MAX_RETRIES):
-            try:
-                response = model.generate_content(
-                    contents,
-                    generation_config=genai.GenerationConfig(
-                        response_mime_type="application/json",
-                    ),
-                )
-                return json.loads(response.text)
-            except Exception as e:
-                if attempt == MAX_RETRIES - 1:
-                    raise
-                delay = RETRY_BASE_DELAY * (2 ** attempt)
-                logger.warning("Gemini retry %d after error: %s", attempt + 1, e)
-                time.sleep(delay)
-    finally:
-        _cleanup_files(uploaded_files)
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = model.generate_content(
+                contents,
+                generation_config=genai.GenerationConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            return json.loads(response.text)
+        except Exception as e:
+            if attempt == MAX_RETRIES - 1:
+                raise
+            delay = RETRY_BASE_DELAY * (2 ** attempt)
+            logger.warning("Gemini retry %d after error: %s", attempt + 1, e)
+            time.sleep(delay)
 
     return {}
