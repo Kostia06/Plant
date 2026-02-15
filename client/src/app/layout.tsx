@@ -9,8 +9,8 @@ const pixelFont = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "Yggdrasil",
-  description: "Video truth analyzer",
+  title: "MindBloom",
+  description: "Grow your mind, prune your distractions.",
 };
 
 export default function RootLayout({
