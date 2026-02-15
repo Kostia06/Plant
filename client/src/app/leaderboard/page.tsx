@@ -32,7 +32,7 @@ export default function LeaderboardPage() {
     const [addMsg, setAddMsg] = useState("");
     const [pendingCount, setPendingCount] = useState(0);
     const [pendingRequests, setPendingRequests] = useState<
-        { id: string; profiles: { display_name: string } }[]
+        { id: string; sender_name: string }[]
     >([]);
     const [showPending, setShowPending] = useState(false);
 
@@ -40,7 +40,6 @@ export default function LeaderboardPage() {
         if (!user) return;
         try {
             // Fetch leaderboard — user + accepted friends
-            // We query directly from Supabase client since the API needs auth headers
             const friendships = await supabase
                 .from("friendships")
                 .select("user_id, friend_id")
@@ -64,29 +63,24 @@ export default function LeaderboardPage() {
                 .in("id", ids);
 
             const scoreMap = new Map(
-                (scores.data || []).map((s) => [s.user_id, s])
+                (scores.data || []).map((s: Record<string, string>) => [s.user_id, s])
             );
             const profileMap = new Map(
-                (profiles.data || []).map((p) => [p.id, p])
+                (profiles.data || []).map((p: Record<string, string>) => [p.id, p])
             );
 
             const board: LeaderboardEntry[] = ids.map((id) => {
-                const s = scoreMap.get(id) || {
-                    current_score: 0,
-                    tree_state: "seedling",
-                    streak_days: 0,
-                };
-                const p = profileMap.get(id) || {
-                    display_name: "Anon",
-                    avatar_url: null,
-                };
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const s: any = scoreMap.get(id);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const p: any = profileMap.get(id);
                 return {
                     user_id: id,
-                    display_name: p.display_name,
-                    avatar_url: p.avatar_url,
-                    current_score: s.current_score,
-                    tree_state: s.tree_state,
-                    streak_days: s.streak_days,
+                    display_name: p?.display_name || "Anon",
+                    avatar_url: p?.avatar_url || null,
+                    current_score: Number(s?.current_score ?? 0),
+                    tree_state: s?.tree_state || "seedling",
+                    streak_days: Number(s?.streak_days ?? 0),
                     is_you: id === user.id,
                     rank: 0,
                 };
@@ -104,15 +98,33 @@ export default function LeaderboardPage() {
 
     const fetchPending = async () => {
         if (!user) return;
-        const { data } = await supabase
+        // Step 1: get pending friendships where I'm the receiver
+        const { data: pendingRows } = await supabase
             .from("friendships")
-            .select("id, user_id, profiles!friendships_user_id_fkey(display_name)")
+            .select("id, user_id")
             .eq("friend_id", user.id)
             .eq("status", "pending");
 
-        const mapped = (data || []).map((d) => ({
-            id: d.id,
-            profiles: Array.isArray(d.profiles) ? d.profiles[0] : d.profiles,
+        if (!pendingRows || pendingRows.length === 0) {
+            setPendingRequests([]);
+            setPendingCount(0);
+            return;
+        }
+
+        // Step 2: look up sender display names
+        const senderIds = pendingRows.map((r: Record<string, string>) => r.user_id);
+        const { data: senderProfiles } = await supabase
+            .from("profiles")
+            .select("id, display_name")
+            .in("id", senderIds);
+
+        const nameMap = new Map(
+            (senderProfiles || []).map((p: Record<string, string>) => [p.id, p.display_name])
+        );
+
+        const mapped = pendingRows.map((r: Record<string, string>) => ({
+            id: r.id,
+            sender_name: nameMap.get(r.user_id) || "Unknown",
         }));
         setPendingRequests(mapped);
         setPendingCount(mapped.length);
@@ -205,7 +217,7 @@ export default function LeaderboardPage() {
                     {showPending &&
                         pendingRequests.map((req) => (
                             <div key={req.id} className="pending-row">
-                                <span>{req.profiles?.display_name || "Unknown"}</span>
+                                <span>{req.sender_name}</span>
                                 <div className="pending-actions">
                                     <button
                                         onClick={() => respondToRequest(req.id, true)}

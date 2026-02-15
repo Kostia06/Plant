@@ -47,6 +47,13 @@ export default function ProfilePage() {
     const [heatmapData, setHeatmapData] = useState<Record<string, number>>({});
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
+    const [copied, setCopied] = useState(false);
+
+    const copyId = async () => {
+        await navigator.clipboard.writeText(userId);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     useEffect(() => {
         if (authLoading) return;
@@ -134,6 +141,14 @@ export default function ProfilePage() {
                         {profile.display_name}
                         {isOwnProfile && <span className="lb-you-badge">YOU</span>}
                     </h1>
+                    {/* User ID — share with friends to add you */}
+                    <div className="user-id-row">
+                        <span className="user-id-label">ID:</span>
+                        <code className="user-id-value">{userId.slice(0, 8)}...{userId.slice(-4)}</code>
+                        <button onClick={copyId} className="btn btn-sm btn-copy">
+                            {copied ? "✓ Copied!" : "📋 Copy"}
+                        </button>
+                    </div>
                     <div className="profile-stats">
                         <div className="stat-block">
                             <span className="stat-value">{score?.current_score || 0}</span>
