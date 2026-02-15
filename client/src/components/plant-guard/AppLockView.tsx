@@ -125,7 +125,7 @@ export function AppLockView() {
     return (
         <div className="page-container pg-page">
             <div className="pg-header">
-                <Link href="/app" className="btn-link pg-back">
+                <Link href="/settings" className="btn-link pg-back">
                     {"<"}- Back
                 </Link>
                 <h1 className="page-title">[!] App Lock</h1>
@@ -180,6 +180,16 @@ export function AppLockView() {
 
             {error && <p className="error-text">{error}</p>}
 
+            {!loading && (
+                <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="btn btn-primary pg-save-btn"
+                >
+                    {saving ? "Saving..." : "[=] Save Selection"}
+                </button>
+            )}
+
             <input
                 type="text"
                 placeholder="Search apps..."
@@ -227,15 +237,6 @@ export function AppLockView() {
                 </div>
             )}
 
-            {!loading && (
-                <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="btn btn-primary pg-save-btn"
-                >
-                    {saving ? "Saving..." : "[=] Save Selection"}
-                </button>
-            )}
         </div>
     );
 }

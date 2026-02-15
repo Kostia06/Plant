@@ -24,8 +24,8 @@ export function AppBlockerGateBridge() {
                     appId: pending.packageName,
                     appName: pending.appName ?? pending.packageName,
                 });
-                const target = `/app/lock-gate?${params.toString()}`;
-                if (pathname !== "/app/lock-gate") {
+                const target = `/settings/lock-gate?${params.toString()}`;
+                if (pathname !== "/settings/lock-gate") {
                     router.push(target);
                 } else {
                     router.replace(target);

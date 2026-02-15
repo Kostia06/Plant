@@ -5,22 +5,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const MENU_ITEMS = [
-  { href: "/app", label: "Dashboard", icon: "🏠" },
-  { href: "/app/app-lock", label: "App Lock", icon: "🔒" },
-  { href: "/app/screen-time", label: "Screen Time", icon: "📊" },
-  { href: "/app/lock-gate", label: "Lock Gate", icon: "🚪" },
-  { href: "/app/earn", label: "Earn", icon: "🌱" },
-  { href: "/app/progress", label: "Progress", icon: "📈" },
-  { href: "/app/analyze", label: "Analyze", icon: "🔍" },
-  { href: "/app/reflections", label: "Reflect", icon: "📝" },
-  { href: "/app/teasers", label: "Teasers", icon: "🧩" },
-  { href: "/app/friends", label: "Friends", icon: "👥" },
-  { href: "/app/profile", label: "Profile", icon: "👤" },
-  { href: "/app/settings", label: "Settings", icon: "⚙️" },
+  { href: "/settings", label: "Dashboard", icon: "🏠" },
+  { href: "/settings/app-lock", label: "App Lock", icon: "🔒" },
+  { href: "/settings/screen-time", label: "Screen Time", icon: "📊" },
+  { href: "/settings/lock-gate", label: "Lock Gate", icon: "🚪" },
+  { href: "/settings/earn", label: "Earn", icon: "🌱" },
+  { href: "/settings/progress", label: "Progress", icon: "📈" },
+  { href: "/settings/analyze", label: "Analyze", icon: "🔍" },
+  { href: "/settings/reflections", label: "Reflect", icon: "📝" },
+  { href: "/settings/teasers", label: "Teasers", icon: "🧩" },
+  { href: "/settings/friends", label: "Friends", icon: "👥" },
+  { href: "/settings/profile", label: "Profile", icon: "👤" },
+  { href: "/settings/settings", label: "Settings", icon: "⚙️" },
 ];
 
 function isActive(pathname: string, href: string) {
-  if (href === "/app") return pathname === "/app";
+  if (href === "/settings") return pathname === "/settings";
   return pathname.startsWith(href);
 }
 

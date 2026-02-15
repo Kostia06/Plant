@@ -11,10 +11,10 @@ export function PlantGuardCard() {
             </div>
             <p className="card-subtitle">Block distracting apps and track screen time</p>
             <div className="pg-card-actions">
-                <Link href="/app/app-lock" className="btn btn-primary pg-card-btn">
+                <Link href="/settings/app-lock" className="btn btn-primary pg-card-btn">
                     [!] App Lock
                 </Link>
-                <Link href="/app/screen-time" className="btn btn-primary pg-card-btn">
+                <Link href="/settings/screen-time" className="btn btn-primary pg-card-btn">
                     [%] Screen Time
                 </Link>
             </div>

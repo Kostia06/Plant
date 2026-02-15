@@ -28,6 +28,7 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const degrowthAudioRef = useRef<HTMLAudioElement | null>(null);
 
+
     // Initialize Audio
     useEffect(() => {
         audioRef.current = new Audio('/audio/growup.mp3');
@@ -101,7 +102,6 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
                 flashOverlay.style.opacity = '0';
             }, 100);
         }
-
         setStageIndex(newStage);
     }, []);
 
@@ -129,6 +129,7 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
         return () => clearTimeout(timer);
     }, [currentScore, targetStageIndex, stageIndex, isWithered, triggerEvolution, triggerDegrowth]);
 
+
     const handleInteract = () => {
         setIsShaking(true);
         setTimeout(() => setIsShaking(false), 500);
@@ -148,7 +149,6 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
                 id="evolution-flash"
                 className="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-300 z-50 mix-blend-screen"
             ></div>
-
             {/* Status Text (Retro Style) */}
             <div className="absolute top-4 left-4 text-slate-800 font-mono z-10 p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50">
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1 font-bold">Status</p>

@@ -32,7 +32,7 @@ export function EarnActivitiesView() {
     return (
         <div className="page-container ea-page">
             <div className="pg-back">
-                <Link href="/app" className="btn-link">
+                <Link href="/settings" className="btn-link">
                     ← Dashboard
                 </Link>
             </div>

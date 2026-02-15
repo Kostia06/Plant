@@ -8,12 +8,11 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [plantState, setPlantState] = useState<PlantMinutesState>(loadState());
-
-  // Temporary local state for testing checks (mocking changes)
   const [devScoreOffset, setDevScoreOffset] = useState(0);
 
+  // Temporary local state for testing checks (mocking changes)
+
   useEffect(() => {
-    // Refresh state periodically or on focus
     const interval = setInterval(() => {
       setPlantState(loadState());
     }, 2000);
@@ -35,15 +34,14 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Quick Actions */}
       <section className="dash-actions">
-        <Link href="/app/lock-gate" className="btn btn-primary dash-action-btn">
+        <Link href="/settings/lock-gate" className="btn btn-primary dash-action-btn">
           🔒 Lock Gate
         </Link>
-        <Link href="/app/earn" className="btn btn-primary dash-action-btn">
+        <Link href="/settings/earn" className="btn btn-primary dash-action-btn">
           🌱 Earn Minutes
         </Link>
-        <Link href="/app/progress" className="btn btn-primary dash-action-btn dash-action-btn--secondary">
+        <Link href="/settings/progress" className="btn btn-primary dash-action-btn dash-action-btn--secondary">
           📊 Daily Progress
         </Link>
       </section>

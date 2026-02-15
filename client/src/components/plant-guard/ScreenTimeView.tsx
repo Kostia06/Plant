@@ -69,7 +69,7 @@ export function ScreenTimeView() {
     return (
         <div className="page-container pg-page">
             <div className="pg-header">
-                <Link href="/app" className="btn-link pg-back">
+                <Link href="/settings" className="btn-link pg-back">
                     {"<"}- Back
                 </Link>
                 <h1 className="page-title">[%] Screen Time</h1>
