@@ -24,10 +24,10 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
     const isWithered = currentScore < 0;
 
     // Ref for the evolution sound
-    // Refs for audio
+    // Refs for audio and visual elements
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const degrowthAudioRef = useRef<HTMLAudioElement | null>(null);
-
+    const flashOverlayRef = useRef<HTMLDivElement | null>(null);
 
     // Initialize Audio
     useEffect(() => {
@@ -54,12 +54,13 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
             }
 
             // Flash Screen (Overlay) - Restore "Mario Style" Intensity
-            const flashOverlay = document.getElementById('evolution-flash');
+            const flashOverlay = flashOverlayRef.current;
             if (flashOverlay) {
                 flashOverlay.style.transition = 'none'; // Instant on
                 flashOverlay.style.backgroundColor = 'white';
-                flashOverlay.style.mixBlendMode = 'screen';
-                flashOverlay.style.opacity = '1';
+                // Remove mix-blend-mode for White flash on mobile (simpler is better for visibility)
+                flashOverlay.style.mixBlendMode = 'normal';
+                flashOverlay.style.opacity = '0.8';
 
                 // Fade out
                 setTimeout(() => {
@@ -89,7 +90,7 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
         }
 
         // Flash Screen (Red tint for bad news) - Intense "Damage" Flash
-        const flashOverlay = document.getElementById('evolution-flash');
+        const flashOverlay = flashOverlayRef.current;
         if (flashOverlay) {
             flashOverlay.style.transition = 'none'; // Instant on
             flashOverlay.style.backgroundColor = '#ef4444'; // Red-500
@@ -138,37 +139,53 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
     const currentSprite = isWithered ? '/sprites/withered tree.png' : STAGES[stageIndex].src;
     const currentName = isWithered ? 'WITHERED' : STAGES[stageIndex].name;
 
+    // Calculate Progress to Next Stage
+    let progressPercentage = 0;
+    let nextStageThreshold = 2000;
+
+    if (stageIndex < STAGES.length - 1) {
+        const currentStageThreshold = STAGES[stageIndex].threshold;
+        nextStageThreshold = STAGES[stageIndex + 1].threshold;
+        const progress = currentScore - currentStageThreshold;
+        const range = nextStageThreshold - currentStageThreshold;
+        progressPercentage = Math.min(100, Math.max(0, (progress / range) * 100));
+    } else {
+        progressPercentage = 100; // Max level
+    }
+
     return (
-        <div className="relative flex flex-col items-center justify-center w-full h-[800px] bg-sky-100 overflow-hidden rounded-xl border-4 border-slate-700 shadow-2xl">
+        <div className="relative flex flex-col items-center justify-center w-full h-[50vh] md:h-[800px] min-h-[400px] bg-sky-100 overflow-hidden rounded-xl border-4 border-slate-700 shadow-2xl transition-all">
 
             {/* Background Pattern (Subtle) */}
             <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
 
             {/* Evolution Flash Overlay */}
             <div
-                id="evolution-flash"
+                ref={flashOverlayRef}
                 className="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-300 z-50 mix-blend-screen"
             ></div>
-            {/* Status Text (Retro Style) */}
-            <div className="absolute top-4 left-4 text-slate-800 font-mono z-10 p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50">
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1 font-bold">Status</p>
-                <p className={`text-2xl font-bold uppercase tracking-widest leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+
+            {/* Status Text (Retro Style) - Mobile Optimized */}
+            <div className="absolute top-2 left-2 md:top-4 md:left-4 text-slate-800 font-mono z-10 p-2 md:p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50 transform scale-75 md:scale-100 origin-top-left">
+                <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1 font-bold">Status</p>
+                <p className={`text-base md:text-2xl font-bold uppercase tracking-widest leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                     {currentName}
                 </p>
             </div>
 
-            <div className="absolute top-4 right-4 text-slate-800 font-mono z-10 p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50 text-right">
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1 font-bold">Growth</p>
-                <p className={`text-3xl font-mono font-bold leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
+            {/* Growth Score - Mobile Optimized */}
+            <div className="absolute top-2 right-2 md:top-4 md:right-4 text-slate-800 font-mono z-10 p-2 md:p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50 text-right transform scale-75 md:scale-100 origin-top-right">
+                <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-wider mb-0.5 md:mb-1 font-bold">Growth</p>
+                <p className={`text-xl md:text-3xl font-mono font-bold leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
                     {currentScore}
                 </p>
             </div>
 
-            {isEvolving && <p className="absolute bottom-8 right-8 text-yellow-500 animate-pulse font-bold tracking-widest text-xl z-20 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm shadow-xl border-2 border-yellow-400">EVOLVING...</p>}
+            {isEvolving && <p className="absolute bottom-20 md:bottom-8 right-8 text-yellow-500 animate-pulse font-bold tracking-widest text-lg md:text-xl z-20 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm shadow-xl border-2 border-yellow-400">EVOLVING...</p>}
 
             {/* The Tree Sprite */}
             <div
-                className={`relative z-20 transition-all duration-500 flex items-end justify-center pb-0 h-full w-full
+                className={`relative z-20 transition-all duration-500 flex items-end justify-center pb-8 md:pb-0 h-full w-full
           ${isShaking ? 'animate-shake' : ''} 
           ${isEvolving ? 'animate-flash-fast scale-110' : 'animate-breath'}
         `}
@@ -180,9 +197,31 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
                     width={800}
                     height={800}
                     priority
-                    className={`object-contain max-h-[90%] max-w-[95%] transition-all duration-500 drop-shadow-xl ${stageIndex === 5 ? 'scale-125 translate-y-4' : ''}`}
+                    className={`object-contain max-h-[85%] md:max-h-[90%] max-w-[90%] md:max-w-[95%] transition-all duration-500 drop-shadow-xl ${stageIndex === 5 ? 'scale-125 translate-y-4' : ''}`}
                     style={{ imageRendering: 'pixelated' }}
                 />
+            </div>
+
+            {/* XP Progress Bar */}
+            <div className="absolute bottom-0 left-0 w-full h-4 md:h-6 bg-slate-700 border-t-2 border-slate-600 z-30">
+                {/* Bar Background */}
+                <div className="w-full h-full bg-slate-800 relative">
+                    {/* Fill */}
+                    <div
+                        className="h-full bg-gradient-to-r from-emerald-500 to-green-400 transition-all duration-1000 ease-out relative"
+                        style={{ width: `${progressPercentage}%` }}
+                    >
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                    </div>
+
+                    {/* Text Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center text-[10px] md:text-xs font-mono font-bold text-white drop-shadow-md">
+                        {stageIndex < STAGES.length - 1
+                            ? `NEXT: ${nextStageThreshold - currentScore} XP`
+                            : 'MAX LEVEL REACHED'}
+                    </div>
+                </div>
             </div>
 
             {/* Styles for custom animations (since Tailwind arbitrary values can be messy) */}
@@ -198,8 +237,8 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
           50% { transform: scaleY(1.03); transform-origin: bottom center; }
         }
         @keyframes flash-fast {
-          0%, 100% { filter: brightness(1) sepia(0); }
-          50% { filter: brightness(2) sepia(1) hue-rotate(-50deg); }
+          0%, 100% { filter: brightness(1) sepia(0); -webkit-filter: brightness(1) sepia(0); }
+          50% { filter: brightness(2) sepia(1) hue-rotate(-50deg); -webkit-filter: brightness(2) sepia(1) hue-rotate(-50deg); }
         }
         .animate-shake { animation: shake 0.4s ease-in-out; }
         .animate-breath { animation: breath 6s ease-in-out infinite; }
