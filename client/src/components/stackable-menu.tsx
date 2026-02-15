@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 
 const MENU_ITEMS = [
   { href: "/app", label: "Dashboard", icon: "🏠" },
-  { href: "/app/lock-gate", label: "Lock Gate", icon: "🔒" },
+  { href: "/app/app-lock", label: "App Lock", icon: "🔒" },
+  { href: "/app/screen-time", label: "Screen Time", icon: "📊" },
+  { href: "/app/lock-gate", label: "Lock Gate", icon: "🚪" },
   { href: "/app/earn", label: "Earn", icon: "🌱" },
-  { href: "/app/progress", label: "Progress", icon: "📊" },
+  { href: "/app/progress", label: "Progress", icon: "📈" },
   { href: "/app/analyze", label: "Analyze", icon: "🔍" },
   { href: "/app/reflections", label: "Reflect", icon: "📝" },
   { href: "/app/teasers", label: "Teasers", icon: "🧩" },
