@@ -1,10 +1,9 @@
 services:
   - type: web
-    name: video-truth-api
+    name: yggdrasil-api
     runtime: docker
+    rootDir: server
     plan: starter
-    dockerfilePath: ./server/Dockerfile
-    dockerContext: ./server
     envVars:
       - key: GEMINI_API_KEY
         sync: false
@@ -12,3 +11,5 @@ services:
         sync: false
       - key: SUPABASE_KEY
         sync: false
+      - key: MAX_VIDEO_DURATION
+        value: "600"

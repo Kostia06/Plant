@@ -1,22 +1,14 @@
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ["SUPABASE_KEY"]
-
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 MAX_VIDEO_DURATION = int(os.getenv("MAX_VIDEO_DURATION", "600"))
 MAX_CONCURRENT_JOBS = int(os.getenv("MAX_CONCURRENT_JOBS", "3"))
-
-TEMP_DIR = Path("/tmp/videos")
-TEMP_DIR.mkdir(parents=True, exist_ok=True)
-
-MAX_KEYFRAMES = 15
-KEYFRAME_INTERVAL_SECONDS = 5
-MAX_FRAME_HEIGHT = 480
-
-GEMINI_MODEL = "gemini-2.0-flash"
+TEMP_DIR = "/tmp/yggdrasil_videos"
+MAX_KEYFRAMES = 30
+KEYFRAME_INTERVAL = 3

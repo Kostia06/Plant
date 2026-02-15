@@ -3,7 +3,7 @@ uvicorn[standard]
 yt-dlp
 google-generativeai
 supabase
+python-dotenv
 python-multipart
 pydantic
 httpx
-python-dotenv
