@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 
 interface MindBloomDisplayProps {
     currentScore: number;
@@ -137,9 +136,19 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
 
     const currentSprite = isWithered ? '/sprites/withered tree.png' : STAGES[stageIndex].src;
     const currentName = isWithered ? 'WITHERED' : STAGES[stageIndex].name;
+    const currentThreshold = isWithered ? 0 : STAGES[stageIndex]?.threshold ?? 0;
+    const nextStage = isWithered ? STAGES[0] : STAGES[stageIndex + 1];
+    const progressDenominator = nextStage ? Math.max(1, nextStage.threshold - currentThreshold) : 1;
+    const growthIntoStage = Math.max(0, currentScore - currentThreshold);
+    const progressPercent = nextStage
+        ? Math.min(100, Math.max(0, Math.round((growthIntoStage / progressDenominator) * 100)))
+        : 100;
+    const pointsToNext = nextStage
+        ? Math.max(0, nextStage.threshold - Math.max(currentScore, currentThreshold))
+        : 0;
 
     return (
-        <div className="relative flex flex-col items-center justify-center w-full aspect-[3/4] max-h-[70vh] bg-sky-100 overflow-hidden rounded-xl border-4 border-slate-700 shadow-2xl">
+        <div className="relative flex flex-col items-center justify-center w-full h-[520px] sm:h-[620px] lg:h-[720px] bg-sky-100 overflow-hidden rounded-xl border-4 border-slate-700 shadow-2xl">
 
             {/* Background Pattern (Subtle) */}
             <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
@@ -149,15 +158,31 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
                 id="evolution-flash"
                 className="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-300 z-50 mix-blend-screen"
             ></div>
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-[82%] max-w-[420px] rounded-xl border border-white/70 bg-white/90 px-3 py-2 backdrop-blur-md shadow-lg">
+                <div className="mb-1.5 flex items-center justify-between text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-600">
+                    <span>Next Milestone</span>
+                    <span>{nextStage ? `${pointsToNext} pts left` : "MAX"}</span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-lime-400 to-green-500 transition-all duration-500"
+                        style={{ width: `${progressPercent}%` }}
+                    />
+                </div>
+                <div className="mt-1 text-[10px] sm:text-xs text-slate-700 text-center font-semibold">
+                    {nextStage ? `${currentName} -> ${nextStage.name}` : "MindBloom fully evolved"}
+                </div>
+            </div>
+
             {/* Status Text (Retro Style) */}
-            <div className="absolute top-3 left-3 text-slate-800 font-mono z-10 p-2 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50">
+            <div className="absolute top-20 left-3 text-slate-800 font-mono z-10 p-2 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-bold">Status</p>
                 <p className={`text-lg font-bold uppercase tracking-widest leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                     {currentName}
                 </p>
             </div>
 
-            <div className="absolute top-3 right-3 text-slate-800 font-mono z-10 p-2 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50 text-right">
+            <div className="absolute top-20 right-3 text-slate-800 font-mono z-10 p-2 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50 text-right">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1 font-bold">Growth</p>
                 <p className={`text-xl font-mono font-bold leading-none ${currentScore < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
                     {currentScore}
@@ -174,12 +199,9 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
         `}
                 onClick={handleInteract}
             >
-                <Image
+                <img
                     src={currentSprite}
                     alt={currentName}
-                    width={400}
-                    height={400}
-                    priority
                     className={`object-contain max-h-[85%] max-w-[90%] transition-all duration-500 drop-shadow-xl ${stageIndex === 5 ? 'scale-110 translate-y-2' : ''}`}
                     style={{ imageRendering: 'pixelated' }}
                 />
