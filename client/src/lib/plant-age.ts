@@ -67,10 +67,8 @@ const SPEND_COSTS: { allowanceMinutes: number; cost: number }[] = [
 // ── Activity rewards ─────────────────────────────────────────
 export const ACTIVITY_REWARDS = [
     { id: "reflection", name: "Reflection", reward: 15, dailyCap: 1, icon: "📝" },
-    { id: "brain_teaser", name: "Brain Teaser (correct)", reward: 8, dailyCap: 3, icon: "🧩" },
-    { id: "video_analysis", name: "Video Fact-Check", reward: 10, dailyCap: 5, icon: "📹" },
-    { id: "goal_completed", name: "Goal Completed", reward: 20, dailyCap: 3, icon: "🎯" },
-
+    { id: "brain_teaser", name: "Brain Teaser", reward: 8, maxReward: 10, minReward: 2, dailyCap: 3, icon: "🧩" },
+    { id: "video_analysis", name: "Video Fact-Check", reward: 10, maxReward: 10, minReward: 5, dailyCap: 5, icon: "📹" },
 ] as const;
 
 // ── Helpers ──────────────────────────────────────────────────

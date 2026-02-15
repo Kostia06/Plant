@@ -102,19 +102,27 @@ export function DailyProgressView() {
                     <div className="dp-activity-row">
                         <span>🧩</span>
                         <span>Brain Teaser</span>
-                        <span>+8</span>
+                        <span>+2-10</span>
                         <span className="dp-activity-max">(max 3/day)</span>
                     </div>
                     <div className="dp-activity-row">
                         <span>📹</span>
                         <span>Video Check</span>
-                        <span>+10</span>
+                        <span>+5-10</span>
                         <span className="dp-activity-max">(max 5/day)</span>
                     </div>
                 </div>
-                <Link href="/settings/earn" className="btn btn-primary dp-earn-btn">
-                    Go Earn More
-                </Link>
+                <div className="dp-earn-links">
+                    <Link href="/settings/reflections" className="btn btn-primary dp-earn-btn">
+                        Reflect
+                    </Link>
+                    <Link href="/teasers" className="btn btn-primary dp-earn-btn">
+                        Brain Teasers
+                    </Link>
+                    <Link href="/analyze" className="btn btn-primary dp-earn-btn">
+                        Analyze Video
+                    </Link>
+                </div>
             </div>
         </div>
     );

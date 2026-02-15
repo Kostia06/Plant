@@ -9,14 +9,12 @@ const MENU_ITEMS = [
   { href: "/settings/app-lock", label: "App Lock", icon: "🔒" },
   { href: "/settings/screen-time", label: "Screen Time", icon: "📊" },
   { href: "/settings/lock-gate", label: "Lock Gate", icon: "🚪" },
-  { href: "/settings/earn", label: "Earn", icon: "🌱" },
   { href: "/settings/progress", label: "Progress", icon: "📈" },
-  { href: "/settings/analyze", label: "Analyze", icon: "🔍" },
+  { href: "/analyze", label: "Analyze", icon: "🔍" },
   { href: "/settings/reflections", label: "Reflect", icon: "📝" },
-  { href: "/settings/teasers", label: "Teasers", icon: "🧩" },
-  { href: "/settings/friends", label: "Friends", icon: "👥" },
-  { href: "/settings/profile", label: "Profile", icon: "👤" },
-  { href: "/settings/settings", label: "Settings", icon: "⚙️" },
+  { href: "/teasers", label: "Teasers", icon: "🧩" },
+  { href: "/friends", label: "Friends", icon: "👥" },
+  { href: "/profile/me", label: "Profile", icon: "👤" },
 ];
 
 function isActive(pathname: string, href: string) {

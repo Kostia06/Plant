@@ -65,18 +65,18 @@ export function CooldownView({ cooldownSeconds, onCooldownEnd }: Props) {
                             <span className="cd-earn-reward">+15 Plant Minutes</span>
                         </div>
                     </Link>
-                    <Link href="/settings/teasers" className="cd-earn-item">
+                    <Link href="/teasers" className="cd-earn-item">
                         <span className="cd-earn-icon">🧩</span>
                         <div className="cd-earn-info">
                             <span className="cd-earn-name">Brain Teasers</span>
-                            <span className="cd-earn-reward">+8 Plant Minutes</span>
+                            <span className="cd-earn-reward">+2-10 Plant Minutes</span>
                         </div>
                     </Link>
-                    <Link href="/settings/analyze" className="cd-earn-item">
+                    <Link href="/analyze" className="cd-earn-item">
                         <span className="cd-earn-icon">📹</span>
                         <div className="cd-earn-info">
                             <span className="cd-earn-name">Fact-Check a Video</span>
-                            <span className="cd-earn-reward">+10 Plant Minutes</span>
+                            <span className="cd-earn-reward">+5-10 Plant Minutes</span>
                         </div>
                     </Link>
                 </div>

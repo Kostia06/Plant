@@ -114,7 +114,7 @@ export function VideoAnalyzerView() {
   return (
     <div className="page-container va-page">
       <div className="pg-back">
-        <Link href="/app" className="btn-link">
+        <Link href="/settings" className="btn-link">
           &larr; Dashboard
         </Link>
       </div>

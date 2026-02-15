@@ -1370,9 +1370,16 @@ html {
   text-align: right;
 }
 
+.dp-earn-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
 .dp-earn-btn {
   width: 100%;
-  margin-top: 0.5rem;
+  font-size: 10px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1809,7 +1816,13 @@ html {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Results — Header */
+/* Results */
+.va-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .va-header-card {
   text-align: center;
 }
@@ -2184,6 +2197,13 @@ html {
 }
 
 /* Results — Bias */
+.va-bias-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
 .va-bias-title {
   font-size: 14px;
   margin-bottom: 0.75rem;
@@ -2614,6 +2634,16 @@ html {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 6px;
+}
+
+.va-history-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -2623,7 +2653,11 @@ html {
   width: 100%;
 }
 
-.va-history-card:hover {}
+.va-history-card:hover {
+  border-color: var(--deep-forest);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
 
 .pf-activity-icon {
   font-size: 16px;
@@ -4347,4 +4381,157 @@ html {
   textarea {
     min-height: 44px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REFLECTIONS (rf-)
+   ═══════════════════════════════════════════════════════════════ */
+.rf-page {
+  max-width: 500px;
+}
+
+.rf-prompt-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-left: 4px solid var(--deep-forest);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.rf-prompt-icon {
+  font-size: 24px;
+}
+
+.rf-prompt-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--root-dark);
+}
+
+.rf-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem 1rem;
+  background: var(--parchment);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--root-dark);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.rf-textarea:focus {
+  border-color: var(--deep-forest);
+  box-shadow: 0 0 0 2px rgba(45, 95, 45, 0.1);
+}
+
+.rf-textarea::placeholder {
+  color: var(--lichen);
+}
+
+.rf-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.4rem 0 0.75rem;
+}
+
+.rf-char-count {
+  font-size: 10px;
+  color: var(--berry-red);
+}
+
+.rf-char-count--valid {
+  color: var(--fern-green);
+}
+
+.rf-reward {
+  font-size: 10px;
+  color: var(--golden-sap);
+  font-weight: bold;
+}
+
+.rf-submit-btn {
+  width: 100%;
+}
+
+/* Done state */
+.rf-done-card {
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+}
+
+.rf-done-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.rf-done-title {
+  font-size: 16px;
+  margin-bottom: 0.25rem;
+}
+
+.rf-done-sub {
+  font-size: 12px;
+  color: var(--fern-green);
+  margin-bottom: 0.5rem;
+}
+
+.rf-done-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* History */
+.rf-history-section {
+  margin-top: 1.5rem;
+}
+
+.rf-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rf-history-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.rf-history-prompt {
+  font-size: 11px;
+  color: var(--deep-forest);
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.rf-history-response {
+  font-size: 11px;
+  color: var(--root-dark);
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+}
+
+.rf-history-date {
+  font-size: 9px;
+  color: var(--text-muted);
 }

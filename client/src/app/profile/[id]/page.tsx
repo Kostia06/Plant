@@ -20,37 +20,37 @@ interface ScoreData {
     streak_days: number;
     tree_state: string;
     total_analyses: number;
-    total_reflections: number;
-    total_goals_completed: number;
-    total_teasers_correct: number;
-}
-
-interface ActivityDay {
-    date: string;
-    count: number;
 }
 
 interface ActivityItem {
     id: string;
-    action_type: string;
+    action: string;
     description: string | null;
     points: number;
     created_at: string;
 }
 
-const TREE_STATE_LABELS: Record<string, string> = {
-    seedling: "Seedling",
-    sapling: "Sapling",
-    healthy: "Healthy Tree",
-    blooming: "Blooming Tree",
+interface ActivityStats {
+    totalAnalyses: number;
+    totalTeasers: number;
+    teasersCorrect: number;
+}
+
+const TREE_EMOJIS: Record<string, string> = {
+    seedling: "\uD83C\uDF31",
+    sapling: "\uD83C\uDF3F",
+    healthy: "\uD83C\uDF33",
+    blooming: "\uD83C\uDF38",
 };
 
-const ACTION_LABELS: Record<string, string> = {
-    analysis: "Analysis",
-    reflection: "Reflection",
-    goal: "Goal",
-    brain_teaser: "Teaser",
-    focus_session: "Focus",
+const ACTION_ICONS: Record<string, string> = {
+    teaser: "\uD83E\uDDE0",
+    analysis: "\uD83D\uDD0D",
+    analyze: "\uD83D\uDD0D",
+    reflection: "\uD83D\uDCDD",
+    goal: "\uD83C\uDFAF",
+    focus_session: "\u23F1\uFE0F",
+    checkin: "\u2705",
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -87,6 +87,11 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     const { user } = useAuth();
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [scores, setScores] = useState<ScoreData | null>(null);
+    const [activityStats, setActivityStats] = useState<ActivityStats>({
+        totalAnalyses: 0,
+        totalTeasers: 0,
+        teasersCorrect: 0,
+    });
     const [activityDays, setActivityDays] = useState<Map<string, number>>(new Map());
     const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -106,21 +111,32 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     async function loadProfile(uid: string) {
         setLoading(true);
 
-        const [profileRes, scoresRes, activityRes, recentRes] = await Promise.all([
-            supabase.from("profiles").select("*").eq("id", uid).single(),
-            supabase.from("user_scores").select("*").eq("user_id", uid).single(),
-            supabase
-                .from("activity_log")
-                .select("created_at")
-                .eq("user_id", uid)
-                .gte("created_at", new Date(Date.now() - 365 * 86400000).toISOString()),
-            supabase
-                .from("activity_log")
-                .select("*")
-                .eq("user_id", uid)
-                .order("created_at", { ascending: false })
-                .limit(10),
-        ]);
+        const oneYearAgo = new Date(Date.now() - 365 * 86400000).toISOString();
+
+        const [profileRes, scoresRes, heatmapRes, recentRes, analysesRes, teasersRes] =
+            await Promise.all([
+                supabase.from("profiles").select("*").eq("id", uid).single(),
+                supabase.from("user_scores").select("*").eq("user_id", uid).single(),
+                supabase
+                    .from("points_ledger")
+                    .select("created_at")
+                    .eq("user_id", uid)
+                    .gte("created_at", oneYearAgo),
+                supabase
+                    .from("points_ledger")
+                    .select("id, action, description, points, created_at")
+                    .eq("user_id", uid)
+                    .order("created_at", { ascending: false })
+                    .limit(15),
+                supabase
+                    .from("user_analyses")
+                    .select("id", { count: "exact", head: true })
+                    .eq("user_id", uid),
+                supabase
+                    .from("puzzle_attempts")
+                    .select("is_correct")
+                    .eq("user_id", uid),
+            ]);
 
         if (profileRes.data) {
             setProfile(profileRes.data as ProfileData);
@@ -131,11 +147,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             setScores(scoresRes.data as ScoreData);
         }
 
-        // Build heatmap data
+        const teaserAttempts = (teasersRes.data ?? []) as { is_correct: boolean }[];
+        setActivityStats({
+            totalAnalyses: analysesRes.count ?? 0,
+            totalTeasers: teaserAttempts.length,
+            teasersCorrect: teaserAttempts.filter((a) => a.is_correct).length,
+        });
+
         const dayMap = new Map<string, number>();
-        if (activityRes.data) {
-            for (const row of activityRes.data) {
-                const day = row.created_at.split("T")[0];
+        if (heatmapRes.data) {
+            for (const row of heatmapRes.data) {
+                const day = (row.created_at as string).split("T")[0];
                 dayMap.set(day, (dayMap.get(day) ?? 0) + 1);
             }
         }
@@ -164,6 +186,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         return (
             <div className="page-container pf-page">
                 <div className="pf-login-prompt">
+                    <p>{"\uD83C\uDF31"}</p>
                     <p className="pf-login-text">Sign in to view profiles</p>
                     <Link href="/login" className="btn btn-primary">Sign In</Link>
                 </div>
@@ -181,7 +204,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
     const heatmapDays = generateHeatmapDays();
 
-    // Calculate month labels for the heatmap
     const monthLabels: { label: string; col: number }[] = [];
     let lastMonth = -1;
     heatmapDays.forEach((day, i) => {
@@ -209,7 +231,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                     <h1 className="pf-name">{profile.display_name}</h1>
                     <div className="pf-details">
                         {profile.age && <span>{profile.age}y</span>}
-                        {profile.major && <span>{profile.major}</span>}
+                        {profile.major && <span>{"\uD83D\uDCDA"} {profile.major}</span>}
                     </div>
                     {profile.interests && profile.interests.length > 0 && (
                         <div className="pf-tags">
@@ -222,32 +244,34 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             </div>
 
             {/* Stats Row */}
-            {scores && (
-                <div className="pf-stats">
-                    <div className="pf-stat">
-                        <span className="pf-stat-value">{scores.current_score}</span>
-                        <span className="pf-stat-label">Score</span>
-                    </div>
-                    <div className="pf-stat">
-                        <span className="pf-stat-value">
-                            {TREE_STATE_LABELS[scores.tree_state] ?? "Seedling"}
-                        </span>
-                        <span className="pf-stat-label">{scores.tree_state}</span>
-                    </div>
-                    <div className="pf-stat">
-                        <span className="pf-stat-value">{scores.streak_days}d</span>
-                        <span className="pf-stat-label">Streak</span>
-                    </div>
-                    <div className="pf-stat">
-                        <span className="pf-stat-value">{scores.total_analyses}</span>
-                        <span className="pf-stat-label">Analyses</span>
-                    </div>
+            <div className="pf-stats">
+                <div className="pf-stat">
+                    <span className="pf-stat-value">{scores?.current_score ?? 0}</span>
+                    <span className="pf-stat-label">Score</span>
                 </div>
-            )}
+                <div className="pf-stat">
+                    <span className="pf-stat-value">
+                        {TREE_EMOJIS[scores?.tree_state ?? "seedling"] ?? "\uD83C\uDF31"}
+                    </span>
+                    <span className="pf-stat-label">{scores?.tree_state ?? "seedling"}</span>
+                </div>
+                <div className="pf-stat">
+                    <span className="pf-stat-value">{"\uD83D\uDD25"} {scores?.streak_days ?? 0}</span>
+                    <span className="pf-stat-label">Streak</span>
+                </div>
+                <div className="pf-stat">
+                    <span className="pf-stat-value">{activityStats.totalAnalyses}</span>
+                    <span className="pf-stat-label">Analyses</span>
+                </div>
+                <div className="pf-stat">
+                    <span className="pf-stat-value">{activityStats.teasersCorrect}/{activityStats.totalTeasers}</span>
+                    <span className="pf-stat-label">Teasers</span>
+                </div>
+            </div>
 
             {/* Activity Heatmap */}
             <div className="pf-section">
-                <h2 className="pf-section-title">Activity</h2>
+                <h2 className="pf-section-title">{"\uD83D\uDCCA"} Activity</h2>
                 <div className="hm-container">
                     <div className="hm-months">
                         {monthLabels.map((m) => (
@@ -287,7 +311,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
             {isOwnProfile && (
                 <div className="pf-privacy">
                     <span className="pf-privacy-label">
-                        Activity visible to friends
+                        {"\uD83D\uDD12"} Activity visible to friends
                     </span>
                     <button onClick={togglePrivacy} className="pf-privacy-toggle">
                         <div className={`pg-toggle ${privacyToggle ? "pg-toggle--on" : ""}`}>
@@ -299,22 +323,22 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
             {/* Recent Activity */}
             <div className="pf-section">
-                <h2 className="pf-section-title">Recent Activity</h2>
+                <h2 className="pf-section-title">{"\uD83D\uDCCB"} Recent Activity</h2>
                 {recentActivity.length === 0 ? (
                     <p className="pf-empty">No activity yet</p>
                 ) : (
                     <div className="pf-activity-list">
                         {recentActivity.map((a) => (
                             <div key={a.id} className="pf-activity-item">
-                                <span className="pf-activity-icon" style={{ fontSize: '10px', fontWeight: 'bold' }}>
-                                    {ACTION_LABELS[a.action_type] ? ACTION_LABELS[a.action_type].substring(0, 2).toUpperCase() : "AC"}
+                                <span className="pf-activity-icon">
+                                    {ACTION_ICONS[a.action] ?? "\uD83D\uDCCC"}
                                 </span>
                                 <div className="pf-activity-info">
                                     <span className="pf-activity-desc">
-                                        {a.description ? a.description.replace(/[\u{1F300}-\u{1F9FF}]/gu, '') : a.action_type}
+                                        {a.description ?? a.action}
                                     </span>
                                     <span className="pf-activity-meta">
-                                        +{a.points} pts · {timeAgo(a.created_at)}
+                                        +{a.points} pts {"\u00B7"} {timeAgo(a.created_at)}
                                     </span>
                                 </div>
                             </div>

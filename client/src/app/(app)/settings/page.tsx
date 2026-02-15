@@ -33,8 +33,14 @@ export default function DashboardPage() {
         <Link href="/settings/lock-gate" className="btn btn-primary dash-action-btn">
           Lock Gate
         </Link>
-        <Link href="/settings/earn" className="btn btn-primary dash-action-btn">
-          Earn Minutes
+        <Link href="/settings/reflections" className="btn btn-primary dash-action-btn">
+          Reflect
+        </Link>
+        <Link href="/teasers" className="btn btn-primary dash-action-btn">
+          Brain Teasers
+        </Link>
+        <Link href="/analyze" className="btn btn-primary dash-action-btn">
+          Analyze Video
         </Link>
         <Link href="/settings/progress" className="btn btn-primary dash-action-btn dash-action-btn--secondary">
           Daily Progress

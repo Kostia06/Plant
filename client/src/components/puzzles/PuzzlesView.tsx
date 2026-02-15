@@ -124,7 +124,7 @@ export function PuzzlesView() {
   return (
     <div className="page-container tz-page">
       <div className="pg-back">
-        <Link href="/app" className="btn-link">
+        <Link href="/settings" className="btn-link">
           &larr; Dashboard
         </Link>
       </div>
@@ -173,7 +173,7 @@ export function PuzzlesView() {
           totalPoints={totalPoints}
           topicName={topicName}
           onTryAnotherTopic={handleReset}
-          onBackToDashboard={() => router.push("/app")}
+          onBackToDashboard={() => router.push("/settings")}
         />
       )}
 
