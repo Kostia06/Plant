@@ -30,7 +30,7 @@ export function DailyProgressView() {
     return (
         <div className="page-container dp-page">
             <div className="pg-back">
-                <Link href="/app" className="btn-link">
+                <Link href="/settings" className="btn-link">
                     ← Dashboard
                 </Link>
             </div>
@@ -112,7 +112,7 @@ export function DailyProgressView() {
                         <span className="dp-activity-max">(max 5/day)</span>
                     </div>
                 </div>
-                <Link href="/app/earn" className="btn btn-primary dp-earn-btn">
+                <Link href="/settings/earn" className="btn btn-primary dp-earn-btn">
                     Go Earn More
                 </Link>
             </div>
