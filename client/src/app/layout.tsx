@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Press_Start_2P } from "next/font/google";
+import { Pixelify_Sans } from "next/font/google";
 import "./globals.css";
 
-const pixelFont = Press_Start_2P({
+const pixelFont = Pixelify_Sans({
   variable: "--font-pixel",
-  weight: "400",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
