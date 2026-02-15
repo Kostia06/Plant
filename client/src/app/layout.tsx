@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Press_Start_2P } from "next/font/google";
+import { Silkscreen } from "next/font/google";
 import "./globals.css";
 import { AppBlockerGateBridge } from "@/components/app-blocker-gate-bridge";
 
-const pixelFont = Press_Start_2P({
+const pixelFont = Silkscreen({
   variable: "--font-pixel",
-  weight: "400",
+  weight: ["400", "700"],
   subsets: ["latin"],
 });
 
