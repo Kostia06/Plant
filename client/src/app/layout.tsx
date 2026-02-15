@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
+import AuthProvider from "./components/AuthProvider";
+import Navbar from "./components/Navbar";
 
 const pixelFont = Press_Start_2P({
   variable: "--font-pixel",
@@ -10,7 +12,7 @@ const pixelFont = Press_Start_2P({
 
 export const metadata: Metadata = {
   title: "Yggdrasil",
-  description: "Video truth analyzer",
+  description: "Grow your mind, prune your distractions.",
 };
 
 export default function RootLayout({
@@ -21,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pixelFont.variable} antialiased`}>
-        {children}
+        <AuthProvider>
+          <Navbar />
+          <main className="main-content">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

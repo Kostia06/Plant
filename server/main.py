@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import TEMP_DIR
-from routes import analyze, health
+from routes import analyze, health, social
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,6 +21,7 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(health.router)
+app.include_router(social.router)
 
 
 @app.on_event("startup")
