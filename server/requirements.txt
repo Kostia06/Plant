@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+yt-dlp
+google-generativeai
+supabase
+python-multipart
+pydantic
+httpx
