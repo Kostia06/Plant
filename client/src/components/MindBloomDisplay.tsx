@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 interface MindBloomDisplayProps {
     currentScore: number;
@@ -26,7 +27,7 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
     // Refs for audio
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const degrowthAudioRef = useRef<HTMLAudioElement | null>(null);
-    const evolutionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
     // Initialize Audio
     useEffect(() => {
@@ -40,23 +41,40 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
     }, 0);
 
     const triggerEvolution = React.useCallback((newStage: number) => {
-        if (evolutionTimeoutRef.current) {
-            clearTimeout(evolutionTimeoutRef.current);
-            evolutionTimeoutRef.current = null;
-        }
-
         setIsEvolving(true);
 
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => {});
-        }
+        // 1. Build Up (Flash/Shake) - handled by CSS class 'animate-pulse-fast'
 
-        setStageIndex(newStage);
-        evolutionTimeoutRef.current = setTimeout(() => {
+        // 2. The Pop (after delay)
+        setTimeout(() => {
+            // Play Sound
+            if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play().catch(e => console.error("Audio play failed", e));
+            }
+
+            // Flash Screen (Overlay) - Restore "Mario Style" Intensity
+            const flashOverlay = document.getElementById('evolution-flash');
+            if (flashOverlay) {
+                flashOverlay.style.transition = 'none'; // Instant on
+                flashOverlay.style.backgroundColor = 'white';
+                flashOverlay.style.mixBlendMode = 'screen';
+                flashOverlay.style.opacity = '1';
+
+                // Fade out
+                setTimeout(() => {
+                    flashOverlay.style.transition = 'opacity 1s ease-out';
+                    flashOverlay.style.opacity = '0';
+                }, 100);
+            }
+
+            // Change Sprite
+            setStageIndex(newStage);
             setIsEvolving(false);
-            evolutionTimeoutRef.current = null;
-        }, 450);
+
+            // 3. Post-Evolution Bounce
+
+        }, 2000); // 2 second build up
     }, []);
 
     const triggerDegrowth = React.useCallback((newStage: number) => {
@@ -70,6 +88,20 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
             degrowthAudioRef.current.play().catch(e => console.error("Audio play failed", e));
         }
 
+        // Flash Screen (Red tint for bad news) - Intense "Damage" Flash
+        const flashOverlay = document.getElementById('evolution-flash');
+        if (flashOverlay) {
+            flashOverlay.style.transition = 'none'; // Instant on
+            flashOverlay.style.backgroundColor = '#ef4444'; // Red-500
+            flashOverlay.style.mixBlendMode = 'multiply'; // Darken/Tint
+            flashOverlay.style.opacity = '0.8';
+
+            // Fade out
+            setTimeout(() => {
+                flashOverlay.style.transition = 'opacity 0.5s ease-out';
+                flashOverlay.style.opacity = '0';
+            }, 100);
+        }
         setStageIndex(newStage);
     }, []);
 
@@ -97,13 +129,6 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
         return () => clearTimeout(timer);
     }, [currentScore, targetStageIndex, stageIndex, isWithered, triggerEvolution, triggerDegrowth]);
 
-    useEffect(() => {
-        return () => {
-            if (evolutionTimeoutRef.current) {
-                clearTimeout(evolutionTimeoutRef.current);
-            }
-        };
-    }, []);
 
     const handleInteract = () => {
         setIsShaking(true);
@@ -119,6 +144,11 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
             {/* Background Pattern (Subtle) */}
             <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
 
+            {/* Evolution Flash Overlay */}
+            <div
+                id="evolution-flash"
+                className="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-300 z-50 mix-blend-screen"
+            ></div>
             {/* Status Text (Retro Style) */}
             <div className="absolute top-4 left-4 text-slate-800 font-mono z-10 p-3 bg-white/80 rounded-lg backdrop-blur-md shadow-lg border border-white/50">
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1 font-bold">Status</p>
@@ -140,13 +170,16 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
             <div
                 className={`relative z-20 transition-all duration-500 flex items-end justify-center pb-0 h-full w-full
           ${isShaking ? 'animate-shake' : ''} 
-          ${isEvolving ? 'scale-105' : 'animate-breath'}
+          ${isEvolving ? 'animate-flash-fast scale-110' : 'animate-breath'}
         `}
                 onClick={handleInteract}
             >
-                <img
+                <Image
                     src={currentSprite}
                     alt={currentName}
+                    width={800}
+                    height={800}
+                    priority
                     className={`object-contain max-h-[90%] max-w-[95%] transition-all duration-500 drop-shadow-xl ${stageIndex === 5 ? 'scale-125 translate-y-4' : ''}`}
                     style={{ imageRendering: 'pixelated' }}
                 />
@@ -164,8 +197,13 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
           0%, 100% { transform: scaleY(1); }
           50% { transform: scaleY(1.03); transform-origin: bottom center; }
         }
+        @keyframes flash-fast {
+          0%, 100% { filter: brightness(1) sepia(0); }
+          50% { filter: brightness(2) sepia(1) hue-rotate(-50deg); }
+        }
         .animate-shake { animation: shake 0.4s ease-in-out; }
         .animate-breath { animation: breath 6s ease-in-out infinite; }
+        .animate-flash-fast { animation: flash-fast 0.1s infinite; }
       `}</style>
         </div>
     );
