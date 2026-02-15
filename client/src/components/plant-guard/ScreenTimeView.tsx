@@ -22,15 +22,46 @@ export function ScreenTimeView() {
     const [apps, setApps] = useState<AppUsage[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalMs, setTotalMs] = useState(0);
+    const [error, setError] = useState<string | null>(null);
+    const [hasUsagePermission, setHasUsagePermission] = useState(true);
 
-    useEffect(() => {
-        AppLockPlugin.getScreenTime().then(({ apps }) => {
+    const refresh = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const perms = await AppLockPlugin.checkPermissions();
+            setHasUsagePermission(perms.usageAccess);
+            if (!perms.usageAccess) {
+                setApps([]);
+                setTotalMs(0);
+                return;
+            }
+
+            const { apps } = await AppLockPlugin.getScreenTime();
             const usedApps = apps.filter((app) => app.usageMs >= 60000);
             const sorted = usedApps.sort((a, b) => b.usageMs - a.usageMs);
             setApps(sorted);
             setTotalMs(sorted.reduce((sum, a) => sum + a.usageMs, 0));
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Failed to load usage data";
+            setError(message);
+        } finally {
             setLoading(false);
-        });
+        }
+    };
+
+    useEffect(() => {
+        void refresh();
+    }, []);
+
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                void refresh();
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => document.removeEventListener("visibilitychange", handleVisibility);
     }, []);
 
     const maxUsage = apps.length > 0 ? apps[0].usageMs : 1;
@@ -51,6 +82,26 @@ export function ScreenTimeView() {
                     {loading ? "..." : formatDuration(totalMs)}
                 </span>
             </div>
+
+            {!hasUsagePermission && (
+                <div className="card" style={{ marginBottom: 12 }}>
+                    <p className="pg-subtitle" style={{ marginBottom: 8 }}>
+                        Usage access is required to read screen time.
+                    </p>
+                    <button
+                        onClick={() => void AppLockPlugin.requestUsagePermission()}
+                        className="btn btn-sm"
+                        style={{ marginRight: 8 }}
+                    >
+                        Grant Usage Access
+                    </button>
+                    <button onClick={() => void refresh()} className="btn btn-sm">
+                        Refresh
+                    </button>
+                </div>
+            )}
+
+            {error && <p className="error-text">{error}</p>}
 
             {loading ? (
                 <p className="loading-text">Loading usage data...</p>
@@ -77,7 +128,7 @@ export function ScreenTimeView() {
                                     <div
                                         className="pg-bar-fill"
                                         style={{
-                                            width: `${Math.max((app.usageMs / maxUsage) * 100, 4)}%`,
+                                            width: `${Math.min(100, Math.max((app.usageMs / maxUsage) * 100, 4))}%`,
                                         }}
                                     />
                                 </div>

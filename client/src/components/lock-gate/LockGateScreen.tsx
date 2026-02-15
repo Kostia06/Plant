@@ -12,6 +12,8 @@ import {
     getActiveSession,
     getCooldown,
     getCooldownRemaining,
+    getPreferredTier,
+    setPreferredTier,
     TIER_CONFIG,
     type Tier,
 } from "@/lib/session-manager";
@@ -39,6 +41,7 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
     const [selectedAllowance, setSelectedAllowance] = useState(0);
     const [challengePassed, setChallengePassed] = useState(false);
     const [plantState, setPlantState] = useState(loadState());
+    const [preferredTier, setPreferredTierState] = useState<Tier | null>(null);
 
     // Check for existing session or cooldown on mount
     useEffect(() => {
@@ -50,6 +53,14 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
         const cooldown = getCooldown(appId);
         if (cooldown) {
             setPhase("cooldown");
+            return;
+        }
+
+        const preferred = getPreferredTier(appId);
+        if (preferred) {
+            setPreferredTierState(preferred);
+            setSelectedTier(preferred);
+            setPhase(preferred === "hard" ? "challenge-and-spend" : "challenge");
         }
     }, [appId]);
 
@@ -60,6 +71,8 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
     }, []);
 
     const handleTierSelect = useCallback((tier: Tier) => {
+        setPreferredTier(appId, tier);
+        setPreferredTierState(tier);
         setSelectedTier(tier);
         setChallengePassed(false);
         if (tier === "easy") {
@@ -71,20 +84,20 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
             // Hard: must do challenge first, then spend
             setPhase("challenge-and-spend");
         }
-    }, []);
+    }, [appId]);
 
     const handleChallengeSuccess = useCallback(() => {
         setChallengePassed(true);
         if (selectedTier === "easy") {
             // Auto-start short session
-            setSelectedAllowance(3);
+            setSelectedAllowance(TIER_CONFIG.easy.allowanceOptions[0]);
             setPhase("session-active");
         } else if (selectedTier === "hard") {
             // Now need to spend
             setPhase("spend");
         } else {
             // Medium with challenge: start session
-            setSelectedAllowance(5);
+            setSelectedAllowance(TIER_CONFIG.medium.allowanceOptions[0]);
             setPhase("session-active");
         }
         setPlantState(loadState());
@@ -144,6 +157,7 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
     if (phase === "challenge" || phase === "challenge-and-spend") {
         return (
             <ChallengeView
+                appId={appId}
                 difficulty={selectedTier || "easy"}
                 tier={selectedTier || "easy"}
                 onSuccess={handleChallengeSuccess}
@@ -188,6 +202,12 @@ export function LockGateScreen({ appId = "demo", appName = "App" }: Props) {
                     </span>
                 </div>
             </div>
+
+            {preferredTier && (
+                <p className="lg-subtitle" style={{ marginBottom: 10 }}>
+                    Preferred unlock mode: {preferredTier.toUpperCase()}
+                </p>
+            )}
 
             <div className="lg-tiers">
                 {(Object.entries(TIER_CONFIG) as [Tier, typeof TIER_CONFIG.easy][]).map(

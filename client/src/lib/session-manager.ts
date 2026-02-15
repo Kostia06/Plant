@@ -225,6 +225,24 @@ export function updateSettings(updates: Partial<LockSettings>): LockSettings {
     return updated;
 }
 
+export function getPreferredTier(appId: string): Tier | null {
+    const settings = getSettings();
+    const tier = settings.tierPerCategory[appId];
+    if (tier === "easy" || tier === "medium" || tier === "hard") return tier;
+    return null;
+}
+
+export function setPreferredTier(appId: string, tier: Tier): LockSettings {
+    const settings = getSettings();
+    return updateSettings({
+        ...settings,
+        tierPerCategory: {
+            ...settings.tierPerCategory,
+            [appId]: tier,
+        },
+    });
+}
+
 // ── Helpers ─────────────────────────────────────────────────
 
 export function formatCountdown(seconds: number): string {

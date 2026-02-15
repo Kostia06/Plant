@@ -12,6 +12,7 @@ import { startFailureCooldown, type Tier, TIER_CONFIG } from "@/lib/session-mana
 import { earn } from "@/lib/plant-age";
 
 interface Props {
+    appId: string;
     difficulty: Difficulty;
     tier: Tier;
     onSuccess: () => void;
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export function ChallengeView({
+    appId,
     difficulty,
     tier,
     onSuccess,
@@ -77,7 +79,7 @@ export function ChallengeView({
         setFailCount(newFails);
         saveAdaptiveResult(false, challenge?.timeLimitSec ? challenge.timeLimitSec * 1000 : 0);
         if (maxFails > 0 && newFails >= maxFails) {
-            startFailureCooldown("demo");
+            startFailureCooldown(appId);
             setLocked(true);
         }
     };
@@ -102,7 +104,7 @@ export function ChallengeView({
             const newFails = failCount + 1;
             setFailCount(newFails);
             if (maxFails > 0 && newFails >= maxFails) {
-                startFailureCooldown("demo");
+                startFailureCooldown(appId);
                 setLocked(true);
             }
         }
@@ -139,7 +141,7 @@ export function ChallengeView({
                 <button className="btn-link ch-back" onClick={onBack}>
                     ← Back
                 </button>
-                <span className="ch-difficulty ch-difficulty--{difficulty}">
+                <span className={`ch-difficulty ch-difficulty--${difficulty}`}>
                     {difficulty.toUpperCase()}
                 </span>
                 {onSwitchToSpend && (

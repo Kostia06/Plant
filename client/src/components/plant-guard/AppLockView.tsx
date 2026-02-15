@@ -25,16 +25,47 @@ export function AppLockView() {
     const [loading, setLoading] = useState(true);
     const [serviceActive, setServiceActive] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [permissions, setPermissions] = useState({
+        usageAccess: false,
+        overlay: false,
+    });
 
-    useEffect(() => {
-        Promise.all([
+    const refreshData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [installedRes, lockedRes, perms] = await Promise.all([
             AppLockPlugin.getInstalledApps(),
             AppLockPlugin.getLockedApps(),
-        ]).then(([{ apps }, { packages }]) => {
-            setApps(apps.sort((a, b) => a.appName.localeCompare(b.appName)));
-            setLockedSet(new Set(packages));
+                AppLockPlugin.checkPermissions(),
+            ]);
+            const sortedApps = [...installedRes.apps].sort((a, b) =>
+                a.appName.localeCompare(b.appName)
+            );
+            setApps(sortedApps);
+            setLockedSet(new Set(lockedRes.packages));
+            setPermissions(perms);
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Failed to load app lock data";
+            setError(message);
+        } finally {
             setLoading(false);
-        });
+        }
+    };
+
+    useEffect(() => {
+        void refreshData();
+    }, []);
+
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                void refreshData();
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => document.removeEventListener("visibilitychange", handleVisibility);
     }, []);
 
     const toggleApp = (pkg: string) => {
@@ -48,15 +79,28 @@ export function AppLockView() {
 
     const handleSave = async () => {
         setSaving(true);
-        await AppLockPlugin.setLockedApps({ packages: Array.from(lockedSet) });
-        setSaving(false);
+        setError(null);
+        try {
+            await AppLockPlugin.setLockedApps({ packages: Array.from(lockedSet) });
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Failed to save app lock selection";
+            setError(message);
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleToggleService = async () => {
-        if (serviceActive) {
-            await AppLockPlugin.stopLockService();
-        } else {
+        setError(null);
+        try {
+            if (serviceActive) {
+                await AppLockPlugin.stopLockService();
+                setServiceActive(false);
+                return;
+            }
+
             const perms = await AppLockPlugin.checkPermissions();
+            setPermissions(perms);
             if (!perms.usageAccess) {
                 await AppLockPlugin.requestUsagePermission();
                 return;
@@ -67,8 +111,11 @@ export function AppLockView() {
             }
             await handleSave();
             await AppLockPlugin.startLockService();
+            setServiceActive(true);
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Failed to toggle lock service";
+            setError(message);
         }
-        setServiceActive(!serviceActive);
     };
 
     const filtered = apps.filter((a) =>
@@ -98,6 +145,40 @@ export function AppLockView() {
                     {serviceActive ? "Stop" : "Start"}
                 </button>
             </div>
+
+            {(!permissions.usageAccess || !permissions.overlay) && (
+                <div className="card" style={{ marginTop: 12 }}>
+                    <p className="pg-subtitle" style={{ marginBottom: 8 }}>
+                        Missing required permissions
+                    </p>
+                    {!permissions.usageAccess && (
+                        <button
+                            onClick={() => void AppLockPlugin.requestUsagePermission()}
+                            className="btn btn-sm"
+                            style={{ marginRight: 8 }}
+                        >
+                            Grant Usage Access
+                        </button>
+                    )}
+                    {!permissions.overlay && (
+                        <button
+                            onClick={() => void AppLockPlugin.requestOverlayPermission()}
+                            className="btn btn-sm"
+                        >
+                            Grant Overlay Permission
+                        </button>
+                    )}
+                    <button
+                        onClick={() => void refreshData()}
+                        className="btn btn-sm"
+                        style={{ marginLeft: 8 }}
+                    >
+                        Refresh
+                    </button>
+                </div>
+            )}
+
+            {error && <p className="error-text">{error}</p>}
 
             <input
                 type="text"

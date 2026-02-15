@@ -1,6 +1,8 @@
 "use client";
 
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
+import { AppBlocker } from "@/lib/capacitor-plugins/app-blocker";
+import type { AppUsageStat } from "@/lib/capacitor-plugins/app-blocker";
 
 export interface AppUsage {
     packageName: string;
@@ -13,6 +15,7 @@ export interface InstalledApp {
     packageName: string;
     appName: string;
     icon?: string;
+    isSystem?: boolean;
 }
 
 export interface AppLockPluginInterface {
@@ -83,8 +86,63 @@ const mockPlugin: AppLockPluginInterface = {
     },
 };
 
+const nativePlugin: AppLockPluginInterface = {
+    async getScreenTime() {
+        const [{ stats }, { apps }] = await Promise.all([
+            AppBlocker.getAppUsageStats({ daysBack: 1 }),
+            AppBlocker.getInstalledApps(),
+        ]);
+
+        const appNameMap = new Map<string, string>(
+            apps.map((app) => [app.packageName, app.appName]),
+        );
+        const appIconMap = new Map<string, string | undefined>(
+            apps.map((app) => [app.packageName, app.icon]),
+        );
+
+        const normalized: AppUsage[] = stats.map((stat: AppUsageStat) => ({
+            packageName: stat.packageName,
+            appName: stat.appName ?? appNameMap.get(stat.packageName) ?? stat.packageName,
+            usageMs: stat.totalTimeMs,
+            icon: stat.icon ?? appIconMap.get(stat.packageName),
+        }));
+
+        return { apps: normalized };
+    },
+    async getInstalledApps() {
+        const { apps } = await AppBlocker.getInstalledApps();
+        return { apps };
+    },
+    async setLockedApps({ packages }) {
+        await AppBlocker.setBlockedApps({ packages });
+    },
+    async getLockedApps() {
+        const { packages } = await AppBlocker.getBlockedApps();
+        return { packages };
+    },
+    async startLockService() {
+        await AppBlocker.startMonitoring({ intervalMs: 2000 });
+    },
+    async stopLockService() {
+        await AppBlocker.stopMonitoring();
+    },
+    async checkPermissions() {
+        const [{ granted: usageAccess }, { granted: overlay }] = await Promise.all([
+            AppBlocker.checkPermission(),
+            AppBlocker.checkOverlayPermission(),
+        ]);
+        return { usageAccess, overlay };
+    },
+    async requestUsagePermission() {
+        await AppBlocker.requestPermission();
+    },
+    async requestOverlayPermission() {
+        await AppBlocker.requestOverlayPermission();
+    },
+};
+
 export const AppLockPlugin: AppLockPluginInterface = Capacitor.isNativePlatform()
-    ? registerPlugin<AppLockPluginInterface>("AppLock")
+    ? nativePlugin
     : mockPlugin;
 
 export function getIconUrl(path: string | undefined): string | null {

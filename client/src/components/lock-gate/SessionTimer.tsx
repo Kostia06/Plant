@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Capacitor } from "@capacitor/core";
+import { AppBlocker } from "@/lib/capacitor-plugins/app-blocker";
 import {
     startSession,
     getRemainingSeconds,
@@ -34,6 +36,13 @@ export function SessionTimer({
         // Start or resume session
         if (!sessionRef.current) {
             sessionRef.current = startSession(appId, allowanceMinutes, tier);
+        }
+
+        if (Capacitor.isNativePlatform()) {
+            void AppBlocker.grantTemporaryAccess({
+                packageName: appId,
+                durationSeconds: allowanceMinutes * 60,
+            });
         }
 
         const interval = setInterval(() => {
