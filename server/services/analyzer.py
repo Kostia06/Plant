@@ -44,6 +44,10 @@ Your job is to analyze BOTH the spoken/audio content AND the visual content thor
 
 5. **Write a brief 2-3 sentence summary** of the video's content and main message.
 
+6. **Classify the video content type** as one of:
+   - "informational" — news, educational, political, scientific, documentary, explainer, opinion/commentary on real-world topics
+   - "entertainment" — music videos, comedy skits, brainrot, memes, gaming clips, vlogs with no factual claims, dance videos, or any content with no verifiable informational value
+
 ## CRITICAL RULES:
 - Be objective and evidence-based
 - If you cannot verify a claim, mark it "unverified" — do NOT guess
@@ -80,7 +84,8 @@ Respond ONLY with valid JSON matching this exact structure (no markdown, no back
     "misleading_visuals": [
       {"timestamp": "M:SS", "description": "what is misleading"}
     ]
-  }
+  },
+  "content_type": "informational|entertainment"
 }"""
 
 
@@ -92,7 +97,9 @@ def _parse_json(text: str) -> dict:
     return json.loads(text)
 
 
-def _calculate_points(claims: list[dict]) -> int:
+def _calculate_points(claims: list[dict], content_type: str) -> int:
+    if content_type != "informational":
+        return 0
     for claim in claims:
         if claim.get("verdict") in ("misleading", "false"):
             return 10
@@ -134,7 +141,8 @@ def analyze(audio_path: str, keyframe_paths: list[str]) -> AnalysisResult:
     if result is None:
         raise RuntimeError("Gemini returned no valid response")
 
-    points = _calculate_points(result.get("claims", []))
+    content_type = result.pop("content_type", "entertainment")
+    points = _calculate_points(result.get("claims", []), content_type)
     result["points_awarded"] = points
 
     return AnalysisResult(**result)
