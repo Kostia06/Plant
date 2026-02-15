@@ -38,9 +38,7 @@ yarn-error.log*
 # vercel
 .vercel
 
-# capacitor
-ios/
-android/
+# capacitor (native dirs tracked in client/)
 
 # typescript
 *.tsbuildinfo

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-PROMPT = """You are a world-class video fact-checker and media literacy analyst for an app called Yggdrasil.
+PROMPT = """You are a world-class video fact-checker and media literacy analyst for an app called Mind Bloom.
 
 You are given the audio track and key visual frames from a video posted on social media.
 

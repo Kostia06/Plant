@@ -1,0 +1,390 @@
+import type { GeneratedPuzzle } from "./puzzle-topics";
+
+export const FALLBACK_PUZZLES: Record<string, GeneratedPuzzle[]> = {
+  media_literacy: [
+    {
+      topic: "media_literacy", category: "media_literacy", difficulty: "easy",
+      question: "A news article says 'experts say' without naming anyone. What's the red flag?",
+      options: ["Too short", "No specific sources cited", "Published online", "Uses photos"],
+      correct_index: 1, explanation: "Credible journalism names its sources. Vague attribution hides lack of evidence.",
+      hint: "Think about how you'd verify the claim.", tags: ["sourcing", "credibility"],
+    },
+    {
+      topic: "media_literacy", category: "media_literacy", difficulty: "medium",
+      question: "Two outlets report opposite conclusions from the same study. Your best first step?",
+      options: ["Trust the bigger outlet", "Read the original study", "Ignore both", "Check social media"],
+      correct_index: 1, explanation: "Primary sources beat secondhand reporting. Headlines often distort findings.",
+      hint: "Where does the most reliable information live?", tags: ["primary-source", "verification"],
+    },
+    {
+      topic: "media_literacy", category: "critical_thinking", difficulty: "medium",
+      question: "A headline reads 'Chemical X linked to cancer.' What does 'linked' most likely mean?",
+      options: ["Proven to cause cancer", "A correlation was found", "FDA confirmed it", "It's banned"],
+      correct_index: 1, explanation: "'Linked' means correlation, not proven causation. Headlines use vague language to imply more.",
+      hint: "Linked and caused are different words for a reason.", tags: ["correlation", "headlines"],
+    },
+    {
+      topic: "media_literacy", category: "media_literacy", difficulty: "hard",
+      question: "An article uses a dramatic protest photo. What should you verify first?",
+      options: ["Photographer's name", "Whether the photo is from this event", "Camera quality", "Number of shares"],
+      correct_index: 1, explanation: "Mismatched photos are a common manipulation tactic. Reverse image search can verify.",
+      hint: "Images can be reused out of context.", tags: ["image-verification", "manipulation"],
+    },
+    {
+      topic: "media_literacy", category: "critical_thinking", difficulty: "easy",
+      question: "A viral post has 50K shares but zero source links. This is most likely:",
+      options: ["Breaking news", "Verified information", "Unverified viral content", "Satire"],
+      correct_index: 2, explanation: "Shares don't equal accuracy. Lack of sources is a strong signal of unverified claims.",
+      hint: "Popularity and truth are different things.", tags: ["viral", "verification"],
+    },
+  ],
+  statistics_lies: [
+    {
+      topic: "statistics_lies", category: "statistics", difficulty: "easy",
+      question: "A graph starts its Y-axis at 90 instead of 0, making a 5% change look huge. This is called:",
+      options: ["Data smoothing", "Truncated Y-axis", "Extrapolation", "Normalization"],
+      correct_index: 1, explanation: "Truncating the Y-axis exaggerates small differences. Always check the scale.",
+      hint: "Look at where the numbers start.", tags: ["graphs", "manipulation"],
+    },
+    {
+      topic: "statistics_lies", category: "statistics", difficulty: "medium",
+      question: "A company surveys only its own customers and reports 95% satisfaction. What's the bias?",
+      options: ["Confirmation bias", "Selection bias", "Recall bias", "Survivorship bias"],
+      correct_index: 1, explanation: "Surveying only customers excludes dissatisfied people who left. The sample isn't representative.",
+      hint: "Who's missing from the sample?", tags: ["sampling", "bias"],
+    },
+    {
+      topic: "statistics_lies", category: "math", difficulty: "medium",
+      question: "Average salary is $200K but most employees earn $50K. What explains the gap?",
+      options: ["Bad data", "Mean skewed by outliers", "Inflation", "Tax deductions"],
+      correct_index: 1, explanation: "A few very high salaries pull the mean up. Median is more representative here.",
+      hint: "Think about mean vs median.", tags: ["average", "outliers"],
+    },
+    {
+      topic: "statistics_lies", category: "statistics", difficulty: "hard",
+      question: "'Our product is 300% better!' Without knowing the baseline, this claim is:",
+      options: ["Impressive", "Scientifically valid", "Essentially meaningless", "Conservative"],
+      correct_index: 2, explanation: "300% better than what? Without a baseline, relative improvements tell you nothing.",
+      hint: "Better than... what exactly?", tags: ["baseline", "relative-claims"],
+    },
+    {
+      topic: "statistics_lies", category: "statistics", difficulty: "medium",
+      question: "A study with 12 participants claims a medical breakthrough. The main concern is:",
+      options: ["Cost of study", "Sample size too small", "Duration", "Location"],
+      correct_index: 1, explanation: "12 participants can't establish reliable conclusions. Small samples have high variance.",
+      hint: "Can you trust results from a tiny group?", tags: ["sample-size", "research"],
+    },
+  ],
+  cognitive_biases: [
+    {
+      topic: "cognitive_biases", category: "cognitive_bias", difficulty: "easy",
+      question: "You keep investing in a failing project because you've already spent so much. This is:",
+      options: ["Smart investing", "Sunk cost fallacy", "Risk management", "Diversification"],
+      correct_index: 1, explanation: "Past costs shouldn't influence future decisions. Only future value matters.",
+      hint: "Can you get that money back regardless?", tags: ["sunk-cost", "decision-making"],
+    },
+    {
+      topic: "cognitive_biases", category: "cognitive_bias", difficulty: "medium",
+      question: "After buying a red car, you suddenly see red cars everywhere. This is:",
+      options: ["Coincidence", "Frequency illusion", "Confirmation bias", "Pattern matching"],
+      correct_index: 1, explanation: "The Baader-Meinhof phenomenon: your brain notices what's recently been on your mind.",
+      hint: "Did the number of red cars actually change?", tags: ["frequency-illusion", "perception"],
+    },
+    {
+      topic: "cognitive_biases", category: "cognitive_bias", difficulty: "medium",
+      question: "A coin lands heads 5 times in a row. You bet on tails because it's 'due.' This is:",
+      options: ["Good probability", "Gambler's fallacy", "Statistical analysis", "Pattern recognition"],
+      correct_index: 1, explanation: "Each flip is independent. Past results don't change future probabilities.",
+      hint: "Does the coin have memory?", tags: ["gamblers-fallacy", "probability"],
+    },
+    {
+      topic: "cognitive_biases", category: "critical_thinking", difficulty: "hard",
+      question: "You overestimate how many people share your opinion. This is:",
+      options: ["Dunning-Kruger effect", "Halo effect", "False consensus effect", "Spotlight effect"],
+      correct_index: 2, explanation: "We assume our views are more common than they are, reinforced by our echo chambers.",
+      hint: "You think everyone agrees with you, but...", tags: ["false-consensus", "social"],
+    },
+    {
+      topic: "cognitive_biases", category: "cognitive_bias", difficulty: "easy",
+      question: "The first price you see ($500) makes $200 seem cheap. This is:",
+      options: ["A good deal", "Anchoring bias", "Loss aversion", "Framing effect"],
+      correct_index: 1, explanation: "The initial number 'anchors' your perception. $200 might not be cheap objectively.",
+      hint: "What if you saw $100 first?", tags: ["anchoring", "pricing"],
+    },
+  ],
+  logical_fallacies: [
+    {
+      topic: "logical_fallacies", category: "logic", difficulty: "easy",
+      question: "'If we allow X, next we'll have Y and Z!' This slippery reasoning is called:",
+      options: ["Straw man", "Slippery slope", "Red herring", "False cause"],
+      correct_index: 1, explanation: "Slippery slope assumes a chain reaction without evidence for each step.",
+      hint: "It's about an unproven chain of events.", tags: ["slippery-slope", "argumentation"],
+    },
+    {
+      topic: "logical_fallacies", category: "critical_thinking", difficulty: "medium",
+      question: "'Everyone is doing it, so it must be right.' This is an appeal to:",
+      options: ["Authority", "Emotion", "Popularity", "Tradition"],
+      correct_index: 2, explanation: "Popularity doesn't equal correctness. Many people have believed wrong things.",
+      hint: "Is something true just because it's popular?", tags: ["bandwagon", "appeal-to-popularity"],
+    },
+    {
+      topic: "logical_fallacies", category: "logic", difficulty: "medium",
+      question: "'You can't trust their climate data because they're not a scientist.' This attacks the:",
+      options: ["Argument itself", "Person making the argument", "Evidence quality", "Methodology"],
+      correct_index: 1, explanation: "Ad hominem attacks the person instead of addressing their actual argument or evidence.",
+      hint: "Focus on what's being attacked.", tags: ["ad-hominem", "argumentation"],
+    },
+    {
+      topic: "logical_fallacies", category: "critical_thinking", difficulty: "hard",
+      question: "'Either we ban all cars or accept all traffic deaths.' This ignores:",
+      options: ["Cost concerns", "Middle-ground solutions", "Public opinion", "Historical data"],
+      correct_index: 1, explanation: "False dilemma presents only two extreme options when many alternatives exist.",
+      hint: "Are there really only two choices?", tags: ["false-dilemma", "binary-thinking"],
+    },
+    {
+      topic: "logical_fallacies", category: "logic", difficulty: "easy",
+      question: "'My grandpa smoked and lived to 90, so smoking is fine.' This relies on:",
+      options: ["Scientific evidence", "Anecdotal evidence", "Statistical analysis", "Expert opinion"],
+      correct_index: 1, explanation: "One person's experience doesn't override population-level data and medical research.",
+      hint: "Is one story enough to prove something?", tags: ["anecdotal", "evidence"],
+    },
+  ],
+  science_sense: [
+    {
+      topic: "science_sense", category: "scientific_reasoning", difficulty: "easy",
+      question: "A supplement says 'clinically proven' but has no peer-reviewed studies. What's missing?",
+      options: ["Marketing budget", "Independent scientific verification", "Celebrity endorsement", "FDA logo"],
+      correct_index: 1, explanation: "'Clinically proven' is a marketing term. Without peer review, the claim is unverified.",
+      hint: "Who checked their work?", tags: ["peer-review", "health-claims"],
+    },
+    {
+      topic: "science_sense", category: "scientific_reasoning", difficulty: "medium",
+      question: "In a drug trial, the control group gets a sugar pill. This controls for the:",
+      options: ["Cost of treatment", "Placebo effect", "Drug taste", "Doctor's time"],
+      correct_index: 1, explanation: "People often improve just from believing they're treated. Controls separate real effects from placebo.",
+      hint: "Belief alone can cause improvement.", tags: ["placebo", "controls"],
+    },
+    {
+      topic: "science_sense", category: "statistics", difficulty: "medium",
+      question: "Chocolate eaters are thinner in one study. Can we conclude chocolate causes weight loss?",
+      options: ["Yes, the study proves it", "No, correlation isn't causation", "Only for dark chocolate", "Yes, if the sample is large"],
+      correct_index: 1, explanation: "Many confounders exist. Thinner people might simply have different overall diets.",
+      hint: "What other factors could explain this?", tags: ["correlation-causation", "confounders"],
+    },
+    {
+      topic: "science_sense", category: "scientific_reasoning", difficulty: "hard",
+      question: "What makes a study 'double-blind'?",
+      options: ["Two studies combined", "Neither participants nor researchers know assignments", "Twice the sample size", "Published in two journals"],
+      correct_index: 1, explanation: "Double-blind prevents both participant and researcher bias from influencing results.",
+      hint: "Who doesn't know what?", tags: ["double-blind", "methodology"],
+    },
+    {
+      topic: "science_sense", category: "critical_thinking", difficulty: "easy",
+      question: "'It's natural, so it's safe.' Is this reasoning valid?",
+      options: ["Yes, natural is always safer", "No, many natural things are toxic", "Only for food", "Depends on the brand"],
+      correct_index: 1, explanation: "Arsenic, hemlock, and snake venom are all natural. Natural doesn't equal safe.",
+      hint: "Can you think of dangerous natural things?", tags: ["naturalistic-fallacy", "health"],
+    },
+  ],
+  ethical_dilemmas: [
+    {
+      topic: "ethical_dilemmas", category: "ethical_dilemma", difficulty: "medium",
+      question: "A company's AI denies more loans to minorities despite 95% overall accuracy. This raises:",
+      options: ["Efficiency concerns", "Algorithmic fairness concerns", "Profit concerns", "Speed concerns"],
+      correct_index: 1, explanation: "High accuracy can mask discriminatory patterns. Fairness requires equity across groups.",
+      hint: "Accuracy for whom?", tags: ["ai-ethics", "fairness"],
+    },
+    {
+      topic: "ethical_dilemmas", category: "critical_thinking", difficulty: "easy",
+      question: "You find a critical bug in shipped software. Your boss wants to patch it quietly. You should:",
+      options: ["Agree silently", "Advocate for notifying affected users", "Quit immediately", "Post it publicly"],
+      correct_index: 1, explanation: "Transparency builds trust. Users deserve to know about risks affecting their data or safety.",
+      hint: "What would you want if you were the user?", tags: ["transparency", "responsibility"],
+    },
+    {
+      topic: "ethical_dilemmas", category: "ethical_dilemma", difficulty: "hard",
+      question: "Which principle says an action is right only if it could be a universal law for everyone?",
+      options: ["Utilitarianism", "Kant's categorical imperative", "Virtue ethics", "Social contract theory"],
+      correct_index: 1, explanation: "Kant argued: before acting, ask 'what if everyone did this?' If it fails, the action is wrong.",
+      hint: "A German philosopher's famous test.", tags: ["kant", "moral-philosophy"],
+    },
+    {
+      topic: "ethical_dilemmas", category: "ethical_dilemma", difficulty: "medium",
+      question: "An autonomous weapon reduces soldier casualties but removes human judgment from combat. The core ethical issue is:",
+      options: ["Maintenance cost", "Removing humans from life-or-death decisions", "Battery life", "Signal latency"],
+      correct_index: 1, explanation: "Delegating lethal force to machines raises profound questions about moral responsibility and accountability.",
+      hint: "Who is responsible when a machine kills?", tags: ["autonomous-weapons", "accountability"],
+    },
+    {
+      topic: "ethical_dilemmas", category: "critical_thinking", difficulty: "easy",
+      question: "You witness a coworker taking office supplies home. The most ethical first step is:",
+      options: ["Report them immediately", "Talk to them privately first", "Ignore it entirely", "Take supplies too"],
+      correct_index: 1, explanation: "Direct conversation respects the person while addressing the issue. Escalation can come later.",
+      hint: "What approach gives them a chance to correct it?", tags: ["workplace-ethics", "confrontation"],
+    },
+  ],
+  pattern_math: [
+    {
+      topic: "pattern_math", category: "pattern_recognition", difficulty: "easy",
+      question: "What comes next: 2, 6, 12, 20, 30, ?",
+      options: ["36", "40", "42", "44"],
+      correct_index: 2, explanation: "Pattern is n*(n+1): 1*2=2, 2*3=6, 3*4=12, 4*5=20, 5*6=30, 6*7=42.",
+      hint: "Look at the differences between consecutive numbers.", tags: ["sequences", "patterns"],
+    },
+    {
+      topic: "pattern_math", category: "math", difficulty: "easy",
+      question: "A farmer has 17 sheep. All but 9 die. How many are left?",
+      options: ["8", "9", "0", "17"],
+      correct_index: 1, explanation: "'All but 9' means 9 survive. The phrasing tricks you into subtracting.",
+      hint: "Read the question very carefully.", tags: ["trick-question", "reading"],
+    },
+    {
+      topic: "pattern_math", category: "math", difficulty: "medium",
+      question: "3 people paint 3 fences in 3 hours. How many people for 9 fences in 3 hours?",
+      options: ["3", "6", "9", "27"],
+      correct_index: 2, explanation: "Each person paints 1 fence in 3 hours. For 9 fences in 3 hours, you need 9 people.",
+      hint: "How many fences does one person paint in 3 hours?", tags: ["rate", "proportion"],
+    },
+    {
+      topic: "pattern_math", category: "math", difficulty: "hard",
+      question: "What is 1/2 of 2/3 of 3/4 of 4/5 of 100?",
+      options: ["5", "10", "15", "20"],
+      correct_index: 1, explanation: "100 * 4/5 * 3/4 * 2/3 * 1/2 = 10. The fractions mostly cancel out.",
+      hint: "Try multiplying the fractions together first.", tags: ["fractions", "simplification"],
+    },
+    {
+      topic: "pattern_math", category: "pattern_recognition", difficulty: "medium",
+      question: "A clock shows 3:15. What's the angle between the hour and minute hands?",
+      options: ["0 degrees", "7.5 degrees", "15 degrees", "90 degrees"],
+      correct_index: 1, explanation: "At 3:15 the minute hand is at 90 degrees. The hour hand has moved 7.5 degrees past the 3 (90+7.5). Angle = 7.5.",
+      hint: "The hour hand moves too, not just at exact hours.", tags: ["clock", "geometry"],
+    },
+  ],
+  logic_games: [
+    {
+      topic: "logic_games", category: "logic", difficulty: "hard",
+      question: "You have 8 identical coins, one lighter. Minimum weighings on a balance scale to find it?",
+      options: ["1", "2", "3", "4"],
+      correct_index: 1, explanation: "Weigh 3 vs 3. If balanced, weigh remaining 2. If unbalanced, weigh 1 vs 1 from the lighter group.",
+      hint: "You can eliminate 2/3 of candidates each weighing.", tags: ["balance-scale", "elimination"],
+    },
+    {
+      topic: "logic_games", category: "logic", difficulty: "medium",
+      question: "All roses are flowers. Some flowers fade quickly. Therefore:",
+      options: ["All roses fade quickly", "Some roses fade quickly", "No valid conclusion about roses", "No roses fade"],
+      correct_index: 2, explanation: "The flowers that fade quickly might not include any roses. We can't conclude anything about roses.",
+      hint: "Do we know WHICH flowers fade quickly?", tags: ["syllogism", "deduction"],
+    },
+    {
+      topic: "logic_games", category: "logic", difficulty: "easy",
+      question: "A is taller than B. C is shorter than B. D is taller than A. Who is shortest?",
+      options: ["A", "B", "C", "D"],
+      correct_index: 2, explanation: "Order: D > A > B > C. C is shorter than B, who is shorter than A, who is shorter than D.",
+      hint: "Line them up from tallest to shortest.", tags: ["ordering", "comparison"],
+    },
+    {
+      topic: "logic_games", category: "logic", difficulty: "medium",
+      question: "If it rains, the ground is wet. The ground is wet. Can we conclude it's raining?",
+      options: ["Yes, definitely", "No, something else could cause wetness", "Only if it's cloudy", "Yes, by logic"],
+      correct_index: 1, explanation: "This is 'affirming the consequent.' Sprinklers, dew, or spills could also cause wetness.",
+      hint: "Rain causes wet ground, but is it the ONLY cause?", tags: ["affirming-consequent", "causation"],
+    },
+    {
+      topic: "logic_games", category: "pattern_recognition", difficulty: "hard",
+      question: "In a room of 23 people, what's the probability that two share a birthday? (Closest answer)",
+      options: ["About 6%", "About 25%", "About 50%", "About 75%"],
+      correct_index: 2, explanation: "The birthday paradox: with 23 people there's a ~50.7% chance of a shared birthday.",
+      hint: "It's much higher than most people guess.", tags: ["birthday-paradox", "probability"],
+    },
+  ],
+  wordplay: [
+    {
+      topic: "wordplay", category: "wordplay", difficulty: "easy",
+      question: "I speak without a mouth and hear without ears. I have no body, but come alive with wind. What am I?",
+      options: ["A ghost", "An echo", "A whisper", "A thought"],
+      correct_index: 1, explanation: "An echo 'speaks' (repeats sound) and 'hears' (responds to sound) without a body.",
+      hint: "You might hear me in a canyon.", tags: ["riddle", "classic"],
+    },
+    {
+      topic: "wordplay", category: "wordplay", difficulty: "easy",
+      question: "The more you take, the more you leave behind. What are they?",
+      options: ["Memories", "Photos", "Footsteps", "Breaths"],
+      correct_index: 2, explanation: "Each step you 'take' leaves a footprint behind. A classic wordplay on 'take.'",
+      hint: "Think about walking.", tags: ["riddle", "wordplay"],
+    },
+    {
+      topic: "wordplay", category: "logic", difficulty: "medium",
+      question: "A man pushes his car to a hotel and loses his fortune. What's happening?",
+      options: ["Car broke down near a casino", "He's playing Monopoly", "Insurance scam", "Tow truck lost his luggage"],
+      correct_index: 1, explanation: "In Monopoly, you push your car token to a hotel property and pay rent.",
+      hint: "This isn't happening on a real road.", tags: ["lateral-thinking", "trick"],
+    },
+    {
+      topic: "wordplay", category: "wordplay", difficulty: "medium",
+      question: "What word becomes shorter when you add two letters to it?",
+      options: ["Long", "Short", "Small", "Brief"],
+      correct_index: 1, explanation: "'Short' + 'er' = 'Shorter' — the word literally becomes 'shorter.'",
+      hint: "The answer is in the question.", tags: ["wordplay", "trick"],
+    },
+    {
+      topic: "wordplay", category: "wordplay", difficulty: "hard",
+      question: "I have cities but no houses, forests but no trees, water but no fish. What am I?",
+      options: ["A dream", "A map", "A painting", "A story"],
+      correct_index: 1, explanation: "A map represents cities, forests, and water without containing the real things.",
+      hint: "You'd use me to find your way.", tags: ["riddle", "representation"],
+    },
+  ],
+  digital_literacy: [
+    {
+      topic: "digital_literacy", category: "media_literacy", difficulty: "easy",
+      question: "An email from 'your bank' asks you to click a link at bank-verify.scam.com. This is likely:",
+      options: ["A security update", "Phishing", "Account verification", "Routine maintenance"],
+      correct_index: 1, explanation: "The domain 'scam.com' is not your bank. Phishing uses fake domains to steal credentials.",
+      hint: "Look at the actual domain name carefully.", tags: ["phishing", "email-safety"],
+    },
+    {
+      topic: "digital_literacy", category: "critical_thinking", difficulty: "medium",
+      question: "A website shows 'HTTPS' but asks for your SSN to claim a prize. HTTPS means:",
+      options: ["The site is trustworthy", "Your connection is encrypted", "Government approved", "Data can't be stolen"],
+      correct_index: 1, explanation: "HTTPS encrypts the connection but says nothing about the site's legitimacy. Scam sites use HTTPS too.",
+      hint: "Encryption and trustworthiness are different things.", tags: ["https", "security"],
+    },
+    {
+      topic: "digital_literacy", category: "critical_thinking", difficulty: "easy",
+      question: "A flashlight app requests access to contacts, camera, location, and messages. This indicates:",
+      options: ["Premium features", "Unnecessary data collection", "Better flashlight", "Standard permissions"],
+      correct_index: 1, explanation: "A flashlight needs camera access (for the LED) at most. Other permissions signal data harvesting.",
+      hint: "What does a flashlight actually need?", tags: ["permissions", "privacy"],
+    },
+    {
+      topic: "digital_literacy", category: "media_literacy", difficulty: "medium",
+      question: "You get a text: 'Your package is delayed. Click here to reschedule.' You didn't order anything. This is:",
+      options: ["A courier update", "Smishing (SMS phishing)", "A wrong number", "A delivery error"],
+      correct_index: 1, explanation: "Unsolicited texts with links about packages you didn't order are a common SMS phishing tactic.",
+      hint: "Did you actually order something?", tags: ["smishing", "scam"],
+    },
+    {
+      topic: "digital_literacy", category: "critical_thinking", difficulty: "hard",
+      question: "A 'free' social media platform makes $50B/year. Its primary product is:",
+      options: ["The app itself", "User attention and data", "Cloud storage", "Customer support"],
+      correct_index: 1, explanation: "If you're not paying, you're the product. Ad-driven platforms monetize user data and attention.",
+      hint: "How does a free service make billions?", tags: ["data-privacy", "business-model"],
+    },
+  ],
+};
+
+export function getFallbackPuzzles(
+  topicId: string,
+  count: number,
+  difficulty: "easy" | "medium" | "hard" | "mixed",
+): GeneratedPuzzle[] {
+  const pool = FALLBACK_PUZZLES[topicId];
+  if (!pool) return [];
+
+  const filtered = difficulty === "mixed"
+    ? pool
+    : pool.filter((p) => p.difficulty === difficulty);
+
+  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}

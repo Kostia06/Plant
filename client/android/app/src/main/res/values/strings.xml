@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Yggdrasil</string>
+    <string name="title_activity_main">Yggdrasil</string>
+    <string name="package_name">com.yggdrasil.app</string>
+    <string name="custom_url_scheme">com.yggdrasil.app</string>
+</resources>

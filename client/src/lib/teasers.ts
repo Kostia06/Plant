@@ -12,7 +12,7 @@ export interface Teaser {
   category: "logic" | "math" | "critical_thinking";
 }
 
-const GENERATION_PROMPT = `Generate exactly 3 brain teasers for a media literacy and critical thinking app called Yggdrasil.
+const GENERATION_PROMPT = `Generate exactly 3 brain teasers for a media literacy and critical thinking app called Mind Bloom.
 
 Include this exact mix:
 1. One logic puzzle (difficulty: easy or medium)

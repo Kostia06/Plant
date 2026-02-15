@@ -5,11 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import TEMP_DIR
-from routes import analyze, health
+from routes import analyze, health, social
 
 logging.basicConfig(level=logging.INFO)
 
-app = FastAPI(title="Yggdrasil Truth Seeker API")
+app = FastAPI(title="Mind Bloom Truth Seeker API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +21,7 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(health.router)
+app.include_router(social.router)
 
 
 @app.on_event("startup")
@@ -30,4 +31,4 @@ def startup():
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to Yggdrasil Truth Seeker API", "docs": "/docs"}
+    return {"message": "Welcome to Mind Bloom Truth Seeker API", "docs": "/docs"}

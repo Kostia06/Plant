@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Press_Start_2P } from "next/font/google";
+import { Silkscreen } from "next/font/google";
 import "./globals.css";
+import { CapacitorInit } from "@/components/capacitor-init";
 
-const pixelFont = Press_Start_2P({
+const pixelFont = Silkscreen({
   variable: "--font-pixel",
   weight: "400",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Yggdrasil",
-  description: "Video truth analyzer",
+  title: "Mind Bloom",
+  description: "Grow your mind, one bloom at a time",
 };
 
 export default function RootLayout({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pixelFont.variable} antialiased`}>
+        <CapacitorInit />
         {children}
       </body>
     </html>
