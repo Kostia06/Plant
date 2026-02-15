@@ -26,15 +26,6 @@ interface FriendOption {
     display_name: string;
 }
 
-const TREE_EMOJIS: Record<string, string> = {
-    seedling: "🌱",
-    sapling: "🌿",
-    healthy: "🌳",
-    blooming: "🌸",
-};
-
-const RANK_BADGES = ["🥇", "🥈", "🥉"];
-
 export default function CircleDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const { user } = useAuth();
@@ -55,7 +46,6 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
     async function loadCircle() {
         setLoading(true);
 
-        // Get circle info
         const { data: circleData } = await supabase
             .from("circles")
             .select("*")
@@ -68,7 +58,6 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
         }
         setCircle(circleData);
 
-        // Get members
         const { data: memberRows } = await supabase
             .from("circle_members")
             .select("user_id")
@@ -111,7 +100,6 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
     async function loadFriendOptions() {
         if (!user) return;
 
-        // Get accepted friends
         const { data: friendships } = await supabase
             .from("friendships")
             .select("user_id, friend_id")
@@ -122,7 +110,6 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
             f.user_id === user.id ? f.friend_id : f.user_id
         );
 
-        // Filter out existing members
         const existingIds = new Set(members.map((m) => m.user_id));
         const availableIds = friendIds.filter((id) => !existingIds.has(id));
 
@@ -144,7 +131,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
             circle_id: resolvedParams.id,
             user_id: friendId,
         });
-        setMessage("Member added! 🌱");
+        setMessage("Member added!");
         setShowAddMember(false);
         loadCircle();
         setTimeout(() => setMessage(""), 2000);
@@ -172,7 +159,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
         return (
             <div className="page-container ci-page">
                 <p className="loading-text">Circle not found</p>
-                <Link href="/circles" className="btn btn-primary">← Back to Circles</Link>
+                <Link href="/circles" className="btn btn-primary">Back to Circles</Link>
             </div>
         );
     }
@@ -181,13 +168,21 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
         <div className="page-container ci-page">
             {/* Circle Header */}
             <div className="ci-detail-header">
-                <Link href="/circles" className="ci-back">← Circles</Link>
+                <Link href="/circles" className="ci-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                    Circles
+                </Link>
                 <div className="ci-detail-title">
-                    <span className="ci-detail-emoji">{circle.emoji}</span>
+                    <span
+                        className="ci-detail-dot"
+                        style={{ backgroundColor: circle.emoji.startsWith('#') ? circle.emoji : '#4A7C59' }}
+                    />
                     <h1 className="ci-detail-name">{circle.name}</h1>
                 </div>
                 <span className="ci-detail-count">
-                    👥 {members.length} member{members.length !== 1 ? "s" : ""}
+                    {members.length} member{members.length !== 1 ? "s" : ""}
                 </span>
             </div>
 
@@ -195,7 +190,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
 
             {/* Circle Leaderboard */}
             <div className="ci-section">
-                <h2 className="fr-section-title">🏆 Circle Leaderboard</h2>
+                <h2 className="fr-section-title">Circle Leaderboard</h2>
                 {members.length === 0 ? (
                     <p className="pf-empty">No members yet. Add friends!</p>
                 ) : (
@@ -206,11 +201,10 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
                                 <Link
                                     key={m.user_id}
                                     href={`/profile/${m.user_id}`}
-                                    className={`lb-row ${isMe ? "lb-row--me" : ""} ${i < 3 ? "lb-row--top" : ""
-                                        }`}
+                                    className={`lb-row ${isMe ? "lb-row--me" : ""} ${i < 3 ? "lb-row--top" : ""}`}
                                 >
                                     <span className="lb-rank">
-                                        {i < 3 ? RANK_BADGES[i] : `#${i + 1}`}
+                                        {`#${i + 1}`}
                                     </span>
                                     <div className="lb-avatar">
                                         {m.avatar_url ? (
@@ -227,8 +221,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
                                             {isMe && <span className="lb-you-badge">YOU</span>}
                                         </span>
                                         <span className="lb-meta">
-                                            {TREE_EMOJIS[m.tree_state] ?? "🌱"} {m.tree_state} · 🔥{" "}
-                                            {m.streak_days}d
+                                            {m.tree_state} · {m.streak_days}d streak
                                         </span>
                                     </div>
                                     <span className="lb-score">{m.current_score}</span>
@@ -247,7 +240,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
                             className="btn btn-primary ci-add-btn"
                             onClick={loadFriendOptions}
                         >
-                            + Add Members
+                            Add Members
                         </button>
                     ) : (
                         <div className="ci-add-members">
@@ -255,7 +248,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
                             {friendOptions.length === 0 ? (
                                 <p className="pf-empty">
                                     All your friends are already in this circle, or you have no
-                                    friends yet
+                                    friends yet.
                                 </p>
                             ) : (
                                 <div className="fr-list">
@@ -271,7 +264,7 @@ export default function CircleDetailPage({ params }: { params: Promise<{ id: str
                                                 className="btn btn-sm btn-primary"
                                                 onClick={() => addMember(f.id)}
                                             >
-                                                + Add
+                                                Add
                                             </button>
                                         </div>
                                     ))}
