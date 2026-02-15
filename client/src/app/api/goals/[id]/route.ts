@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { awardPoints } from "@/lib/points";
+import { awardPoints, POINTS } from "@/lib/points";
+import { validateUserId } from "@/lib/validators";
+import { checkRateLimit } from "@/lib/rate-limiter";
+
+const ONE_HOUR_MS = 3_600_000;
 
 export async function PATCH(
   request: NextRequest,
@@ -11,46 +15,90 @@ export async function PATCH(
     const body = await request.json();
     const { user_id } = body;
 
-    if (!user_id) {
+    const userCheck = validateUserId(user_id);
+    if (!userCheck.valid) {
+      return NextResponse.json({ error: userCheck.error }, { status: 400 });
+    }
+
+    const rateCheck = checkRateLimit(user_id, "goals");
+    if (!rateCheck.allowed) {
       return NextResponse.json(
-        { error: "user_id is required" },
+        { error: "Too many requests", retry_after: rateCheck.retryAfter },
+        { status: 429 },
+      );
+    }
+
+    const { data: goal, error: fetchError } = await supabase
+      .from("goals")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !goal) {
+      return NextResponse.json({ error: "Goal not found" }, { status: 404 });
+    }
+
+    if (goal.user_id !== user_id) {
+      return NextResponse.json({ error: "Goal not found" }, { status: 404 });
+    }
+
+    if (goal.is_completed) {
+      return NextResponse.json(
+        { error: "Goal already completed" },
+        { status: 409 },
+      );
+    }
+
+    const ageMs = Date.now() - new Date(goal.created_at).getTime();
+    if (ageMs < ONE_HOUR_MS) {
+      return NextResponse.json(
+        {
+          error: "Goals must exist for at least 1 hour before completion.",
+        },
         { status: 400 },
       );
     }
 
-    const { data: goal, error } = await supabase
+    const { data: limits } = await supabase.rpc("get_daily_limits", {
+      uid: user_id,
+    });
+
+    if (limits && limits.goals_completed_count >= 3) {
+      return NextResponse.json(
+        { error: "Daily goal completion limit reached (3/day)" },
+        { status: 429 },
+      );
+    }
+
+    const { error: updateError } = await supabase
       .from("goals")
       .update({
         is_completed: true,
         completed_at: new Date().toISOString(),
-        points_earned: 30,
+        points_earned: POINTS.GOAL_COMPLETED,
       })
-      .eq("id", id)
-      .eq("user_id", user_id)
-      .select()
-      .single();
+      .eq("id", id);
 
-    if (error || !goal) {
-      return NextResponse.json({ error: "Goal not found" }, { status: 404 });
-    }
+    if (updateError) throw updateError;
 
-    const scoreData = await awardPoints(
+    const scoreResult = await awardPoints(
       user_id,
       "goal",
-      30,
+      POINTS.GOAL_COMPLETED,
       `Completed goal: ${goal.title}`,
+      id,
     );
 
-    await supabase
-      .from("user_scores")
-      .update({
-        total_goals_completed: supabase.rpc ? undefined : 0,
-      })
-      .eq("user_id", user_id);
-
-    return NextResponse.json({ goal, score: scoreData });
+    return NextResponse.json({
+      goal_id: id,
+      completed: true,
+      points_earned: scoreResult.points_awarded,
+      new_score: scoreResult.new_score,
+      tree_state: scoreResult.tree_state,
+      streak_days: scoreResult.streak_days,
+    });
   } catch (error) {
-    console.error("Goals PATCH error:", error);
+    console.error("Goal PATCH error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -66,24 +114,26 @@ export async function DELETE(
     const { id } = await params;
     const userId = request.nextUrl.searchParams.get("user_id");
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "user_id is required" },
-        { status: 400 },
-      );
+    const userCheck = validateUserId(userId ?? "");
+    if (!userCheck.valid) {
+      return NextResponse.json({ error: userCheck.error }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { data: goal } = await supabase
       .from("goals")
-      .delete()
+      .select("user_id")
       .eq("id", id)
-      .eq("user_id", userId);
+      .single();
 
-    if (error) throw error;
+    if (!goal || goal.user_id !== userId) {
+      return NextResponse.json({ error: "Goal not found" }, { status: 404 });
+    }
 
-    return NextResponse.json({ success: true });
+    await supabase.from("goals").delete().eq("id", id);
+
+    return NextResponse.json({ deleted: true });
   } catch (error) {
-    console.error("Goals DELETE error:", error);
+    console.error("Goal DELETE error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -9,7 +9,7 @@ export async function GET() {
       .order("current_score", { ascending: false })
       .limit(20);
 
-    return NextResponse.json({ leaderboard: data || [] });
+    return NextResponse.json({ leaderboard: data ?? [] });
   } catch (error) {
     console.error("Leaderboard GET error:", error);
     return NextResponse.json(

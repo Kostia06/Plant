@@ -1,71 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getScoreProfile, getStreakMultiplier } from "@/lib/points";
+import { validateUserId } from "@/lib/validators";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get("user_id");
 
-    if (!userId) {
+    const userCheck = validateUserId(userId ?? "");
+    if (!userCheck.valid) {
+      return NextResponse.json({ error: userCheck.error }, { status: 400 });
+    }
+
+    const rateCheck = checkRateLimit(userId!, "score");
+    if (!rateCheck.allowed) {
       return NextResponse.json(
-        { error: "user_id is required" },
-        { status: 400 },
+        { error: "Too many requests", retry_after: rateCheck.retryAfter },
+        { status: 429 },
       );
     }
 
-    const today = new Date().toISOString().split("T")[0];
-
-    const { data: score } = await supabase
-      .from("user_scores")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-
-    const { data: todayReflection } = await supabase
-      .from("reflections")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("reflection_date", today)
-      .single();
-
-    const { data: todayTeasers } = await supabase
-      .from("teaser_attempts")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("teaser_date", today);
-
-    const { data: todayGoals } = await supabase
-      .from("goals")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("is_completed", true)
-      .gte("completed_at", `${today}T00:00:00Z`)
-      .lt("completed_at", `${today}T23:59:59Z`);
-
-    const { data: todayPoints } = await supabase
-      .from("points_ledger")
-      .select("points")
-      .eq("user_id", userId)
-      .eq("ledger_date", today);
-
-    const pointsToday = (todayPoints || []).reduce(
-      (sum, r) => sum + r.points,
-      0,
-    );
+    const profile = await getScoreProfile(userId!);
 
     return NextResponse.json({
-      current_score: score?.current_score || 0,
-      tree_state: score?.tree_state || "seedling",
-      streak_days: score?.streak_days || 0,
-      total_analyses: score?.total_analyses || 0,
-      total_reflections: score?.total_reflections || 0,
-      total_goals_completed: score?.total_goals_completed || 0,
-      total_teasers_correct: score?.total_teasers_correct || 0,
-      today: {
-        reflection_done: !!todayReflection,
-        teasers_completed: todayTeasers?.length || 0,
-        goals_completed_today: todayGoals?.length || 0,
-        points_earned_today: pointsToday,
-      },
+      current_score: profile.current_score,
+      tree_state: profile.tree_state,
+      streak_days: profile.streak_days,
+      streak_multiplier: getStreakMultiplier(profile.streak_days),
+      total_analyses: profile.total_analyses,
+      total_reflections: profile.total_reflections,
+      total_goals_completed: profile.total_goals_completed,
+      total_teasers_correct: profile.total_teasers_correct,
+      days_inactive: profile.days_inactive,
+      today: profile.today,
     });
   } catch (error) {
     console.error("Score GET error:", error);
