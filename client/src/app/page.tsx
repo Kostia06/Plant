@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import YggdrasilDisplay from '@/components/YggdrasilDisplay';
+import MindBloomDisplay from '@/components/MindBloomDisplay';
 
 export default function Home() {
   const [score, setScore] = useState(0);
@@ -13,7 +13,7 @@ export default function Home() {
       </h1>
 
       <div className="w-full max-w-4xl">
-        <YggdrasilDisplay currentScore={score} />
+        <MindBloomDisplay currentScore={score} />
       </div>
 
       {/* Mock Controls for Demo */}

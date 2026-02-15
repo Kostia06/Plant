@@ -107,10 +107,17 @@ export default function MindBloomDisplay({ currentScore }: MindBloomDisplayProps
 
     // Handle Evolution
     useEffect(() => {
-        if (isWithered) return; // No evolution if withered
-
         // Wrap in timeout to avoid "setState during render" lint error
         const timer = setTimeout(() => {
+            // Special case: Transitioning TO Withered state (Score < 0)
+            if (isWithered && stageIndex !== -1) {
+                // We use -1 or just let the score drive it, but we need the effect
+                triggerDegrowth(-1); // Use a dummy index or handle logic to just play sound/flash
+                return;
+            }
+
+            if (isWithered) return; // If already withered, do nothing
+
             if (targetStageIndex > stageIndex) {
                 triggerEvolution(targetStageIndex);
             } else if (targetStageIndex < stageIndex) {
